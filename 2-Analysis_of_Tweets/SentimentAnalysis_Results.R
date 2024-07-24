@@ -190,7 +190,7 @@ if(!is.null(language))
           
           # SENTIMENT ANALYSIS RESULTS
           if(posi == 1) plotTermPositiveResults(scores[[2]],strp,lang,"darkgreen")
-          if(nega == 1)plotTermNegativeResults(scores[[3]],strn,lang,"darkred")
+          if(nega == 1) plotTermNegativeResults(scores[[3]],strn,lang,"darkred")
           
           # GEOLOCALIZATION RESULTS
           if(geol == 1)      geoResults(scores[[1]],lang)
