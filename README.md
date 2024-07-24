@@ -9,7 +9,7 @@ This GitHub project features a prototype designed to gauge market sentiment abou
 
 ## Overview
 
-The prototype was developed in 2016 using `R` using `text mining`, `sentiment analysis` and `visualizations` to leverage these functionalities:
+The prototype was developed in 2016 using `R`, incorporating `text mining`, `sentiment analysis` and `visualizations` to leverage these functionalities:
 
 ![Use-case-diagram](./img/use_cases.png)
 
