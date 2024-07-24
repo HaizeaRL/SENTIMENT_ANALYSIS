@@ -1,9 +1,12 @@
+
+# TODO: komentatu kodigoa
+
 # -----------------------------
 # createDefaultSentimentFiles
 #-----------------------------
 createDefaultSentimentFiles<-function()
 {
-  dir<-paste(Sys.getenv("R_ROOT"),"/1-Sentiment_Files/",sep="")
+  dir<-paste(Sys.getenv("R_ROOT"),"/1-Emotions_categorization_files/",sep="")
   #EN
   source("English_Sentiment_Files.R")
   #ES

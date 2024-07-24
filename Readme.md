@@ -22,13 +22,13 @@ The project consists of these files and folders:
 This project consists of:
 
 -   Two working directories:
-    -   `1-Sentiment_Files`
+    -   `1-Emotions_categorization_Files`
     -   `2-Analysis_of_Tweets`
 -   A comma-separated file:
     -   `countries.csv`
 -   A compressed file:
     -   `Folders_to_add_for_DEMO.rar`
 -   Three scripts that corresponds to the three main tasks of the program:
-    -   `Launch_Searching.R` : for creation of categories.
-    -   `Launch_Sentiment_Files_Creation.R` - for tweet search.
-    -   `Launch_Tweets_Analysis.R` - analysis of tweets.
+    -   `1-Launch_Emotions_categorization_Files_Creation.R` - for tweet search.
+    -   `2.1-Launch_Searching.R` : for creation of categories.
+    -   `2.2-Launch_Tweets_Analysis.R` - analysis of tweets.

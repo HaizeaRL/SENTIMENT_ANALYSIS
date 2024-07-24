@@ -1,4 +1,6 @@
-dir<-paste(Sys.getenv("R_ROOT"),"/1-Sentiment_Files/",sep="")
+# TODO: komentatu kodigoa
+
+dir<-paste(Sys.getenv("R_ROOT"),"/1-Emotions_categorization_files/",sep="")
 
 setwd(dir)
 source("Sentiment_Files_Functions.R")
