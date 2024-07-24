@@ -19,8 +19,6 @@ The project consists of these files and folders:
 
 ![Project-structure](./img/project_structure.png)
 
-This project consists of:
-
 -   Two working directories:
     -   `1-Sentiment_Files`
     -   `2-Analysis_of_Tweets`
