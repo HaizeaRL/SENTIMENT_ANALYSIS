@@ -13,7 +13,7 @@ repeat {
   user_input <- as.integer(readline(prompt = "Enter your choice: "))
   
   # Handle the user's choice and determine whether to continue or exit
-  if (!handle_menu_option(user_input)) {
+  if (!handle_main_menu_option(user_input)) {
     
     # remove all used variables
     varsToPurge <- as.list(ls())
