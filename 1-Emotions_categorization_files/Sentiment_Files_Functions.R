@@ -132,6 +132,160 @@ create_and_display_default_sent_files<-function(lang, msg){
   print(default_sentiment_dict[[paste0("Neg_",lang)]])  
 }
 
+#TODO!!
+handle_adding_actions <- funtion(option, lang, msg){
+  
+  # ESKATU ZERRENDA OSOA
+  # ERREKUPERATU ORAINARTEKO DAGOKION ZERRENDA ETA BERRIAK GEHITU 
+  # DICT EGUNERATU
+  # FITXATEGIA EZABATU ETA BERRIA SORTU DATU BERRIEKIN
+}
+
+handle_file_option <- function(option, lang, msg) {
+  
+  #' Function that handles file updating action
+  #' 
+  #' @param option 
+  #'   1 changes only in positive file
+  #'   2 changes only in negative file
+  #'   3 changes in both files
+  #' @param lang 
+  #'   "ES" for Spanish prompt messages
+  #'   "EN" for English prompt messages
+  #' @param msg 
+  #'    Corresponding language prompt message list
+  #' @return NULL 
+  #' This function does not return a value but handle actions.
+  #' @examples
+  #' # Example usage:
+  #' handle_file_option(option = 1, lang = "ES" , msg = list()) # redirect to add new values in positive file in Spanish
+  #'
+  
+  if (option == 1) {
+    #handle_adding_actions(option,lang, msg)   # "POSITIVE"
+    return(FALSE)  # exit the loop
+    
+  } else if (option == 2) {
+    #handle_adding_actions(option,lang, msg)   # "NEGATIVE"
+    return(FALSE)  # exit the loop
+    
+  } else if (option == 3) {
+    #handle_adding_actions(option,lang, msg)   # "BOTH"
+    return(FALSE)  # exit the loop
+    
+  } else {
+    # re-ask for correct option
+    cat(msg[[11]])
+    return(TRUE)  # continue the loop
+  }
+}
+
+display_which_file_menu <- function(lang, msg){
+  
+  #' Function display options to modify files
+  #' Only positive or negative file or both.
+  #' 
+  #' @param lang 
+  #'   "ES" for Spanish prompt messages
+  #'   "EN" for English prompt messages
+  #' @param msg 
+  #'    Corresponding language prompt message list
+  #' @return NULL 
+  #' This function does not return a value but handle actions.
+  #' @examples
+  #' # Example usage:
+  #' display_which_file_menu(lang = "ES" , msg = list()) # display file options in Spanish
+  #'
+  
+  repeat {
+    cat(msg[[5]])
+    cat(paste0("1:",paste0(msg[[6]][1],"\n")))
+    cat(paste0("2:",paste0(msg[[6]][2],"\n")))
+    cat(paste0("3:",paste0(msg[[6]][3],"\n")))
+    
+    # Read user input
+    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
+    
+    # Handle the user's choice and determine whether to continue or exit
+    if (!handle_file_option(user_input, lang, msg)) {
+      break  # Exit the loop
+    }
+  }
+}
+
+handle_change_option <- function(option, lang, msg) {
+  
+  #' Function that handles new emotions adding menu responses
+  #' 
+  #' @param option 
+  #'   1 redirect to adding actions
+  #'   2 close the program
+  #'   else display an error and re-ask for correct option
+  #' @param lang 
+  #'   "ES" for Spanish prompt messages
+  #'   "EN" for English prompt messages
+  #' @param msg 
+  #'    Corresponding language prompt message list
+  #' @return NULL 
+  #' This function does not return a value but handle actions.
+  #' @examples
+  #' # Example usage:
+  #' handle_change_option(option = 1, lang = "ES" , msg = list()) # redirect new category adding action in Spanish
+  #'
+  
+  if (option == 1) {
+    
+    # manage which file to update
+    display_which_file_menu(lang, msg)
+    return(FALSE)  # exit the loop
+    
+  } else if (option == 2) {
+    
+    # closing the program
+    cat(msg[[12]])
+    return(FALSE)  # exit the loop
+    
+  } else {
+    
+    # re-ask for correct option
+    cat(msg[[11]])
+    return(TRUE)  # continue the loop
+  }
+}
+
+display_adding_menu <- function(lang, msg){
+  
+  #' Function that display new emotions adding option and handles the response
+  #' Prompt message are in corresponding language
+  #' 
+  #' @param lang 
+  #'   "ES" for Spanish prompt messages
+  #'   "EN" for English prompt messages
+  #' @param msg 
+  #'    Corresponding language prompt message list
+  #' @return NULL 
+  #' This function does not return a value but handle actions.
+  #' @examples
+  #' # Example usage:
+  #' display_adding_menu(lang = "ES" , msg = list())  # prompt Spanish messages and handle actions
+  #'
+  
+  repeat {
+    cat(msg[[3]])
+    cat(paste0("1:",paste0(msg[[4]][1],"\n")))
+    cat(paste0("2:",paste0(msg[[4]][2],"\n")))
+    
+    # Read user input
+    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
+    
+    # Handle the user's choice and determine whether to continue or exit
+    if (!handle_change_option(user_input, lang, msg)) {
+      break  # Exit the loop 
+    }
+  }
+}
+
+
 handle_actions<-function(option){
   
   #' Function that handles languages based actions
@@ -207,328 +361,175 @@ handle_menu_option <- function(option) {
   }
 }
 
-display_adding_menu <- function(lang, msg){
-  
-  #' Function that display new emotions adding option and handles the response
-  #' Prompt message are in corresponding language
-  #' 
-  #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
-  #' @param msg 
-  #'    Corresponding language prompt message list
-  #' @return NULL 
-  #' This function does not return a value but handle actions.
-  #' @examples
-  #' # Example usage:
-  #' display_adding_menu(lang = "ES" , msg = list())  # prompt Spanish messages and handle actions
-  #'
-  
-  repeat {
-    cat(msg[[3]])
-    cat(paste0("1:",paste0(msg[[4]][1],"\n")))
-    cat(paste0("2:",paste0(msg[[4]][2],"\n")))
-    
-    # Read user input
-    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
-    
-    # Handle the user's choice and determine whether to continue or exit
-    if (!handle_change_option(user_input, lang, msg)) {
-      break  # Exit the loop 
-    }
-  }
-}
-
-
-handle_file_option <- function(option, lang, msg) {
-  
-  #' Function that handles file updating action
-  #' 
-  #' @param option 
-  #'   1 changes only in positive file
-  #'   2 changes only in negative file
-  #'   3 changes in both files
-  #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
-  #' @param msg 
-  #'    Corresponding language prompt message list
-  #' @return NULL 
-  #' This function does not return a value but handle actions.
-  #' @examples
-  #' # Example usage:
-  #' handle_file_option(option = 1, lang = "ES" , msg = list()) # redirect to add new values in positive file in Spanish
-  #'
-  
-  if (option == 1) {
-    # actions for "POSITIVE"
-    #handle_adding_actions(lang, msg)
-    
-    return(FALSE)  # exit the loop
-    
-  } else if (option == 2) {
-    
-    # actions for "NEGATIVE"
-    #handle_adding_actions(lang, msg)
-    return(FALSE)  # exit the loop
-    
-  } else if (option == 3) {
-    
-    # actions for "BOTH"
-    #handle_adding_actions(lang, msg)
-    return(FALSE)  # exit the loop
-    
-  } else {
-    # re-ask for correct option
-    cat(msg[[11]])
-    return(TRUE)  # continue the loop
-  }
-}
-
-display_which_file_menu <- function(lang, msg){
-  
-  #' Function display options to modify files
-  #' Only positive or negative file or both.
-  #' 
-  #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
-  #' @param msg 
-  #'    Corresponding language prompt message list
-  #' @return NULL 
-  #' This function does not return a value but handle actions.
-  #' @examples
-  #' # Example usage:
-  #' display_which_file_menu(lang = "ES" , msg = list()) # display file options in Spanish
-  #'
-  
-  repeat {
-    cat(msg[[5]])
-    cat(paste0("1:",paste0(msg[[6]][1],"\n")))
-    cat(paste0("2:",paste0(msg[[6]][2],"\n")))
-    cat(paste0("3:",paste0(msg[[6]][3],"\n")))
-    
-    # Read user input
-    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
-    
-    # Handle the user's choice and determine whether to continue or exit
-    if (!handle_file_option(user_input, lang, msg)) {
-      break  # Exit the loop
-    }
-  }
-}
-
-# Function to handle the menu options
-handle_change_option <- function(option, lang, msg) {
-  
-  #' Function that handles new emotions adding menu responses
-  #' 
-  #' @param option 
-  #'   1 redirect to adding actions
-  #'   2 close the program
-  #'   else display an error and re-ask for correct option
-  #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
-  #' @param msg 
-  #'    Corresponding language prompt message list
-  #' @return NULL 
-  #' This function does not return a value but handle actions.
-  #' @examples
-  #' # Example usage:
-  #' handle_change_option(option = 1, lang = "ES" , msg = list()) # redirect new category adding action in Spanish
-  #'
-  
-  if (option == 1) {
-    
-    # manage which file to update
-    display_which_file_menu(lang, msg)
-    return(FALSE)  # exit the loop
-    
-  } else if (option == 2) {
-    
-    # closing the program
-    cat(msg[[12]])
-    return(FALSE)  # exit the loop
-    
-  } else {
-    
-    # re-ask for correct option
-    cat(msg[[11]])
-    return(TRUE)  # continue the loop
-  }
-}
-
-
-
-# ----------------------------
-# addDataToCorrespondingFile
-#----------------------------
-
-addDataToCorrespondingFile <-function(lang,file,text)
-{
-  handleFiles(file,text,lang)
-}
-
-# --------------
-# loopAskData
-#---------------
-
-loopAskData<-function(text)
-{
-  str <- -1
-  lista <-vector()
-  while(str != 0)
-  {
-    cat(text[[5]]) #MSG:INTRODUZCA DATOS
-    str <-readline()
-    if(str!=0 && str!="") lista<-c(lista,str)
-     # print(lista)
-  }
-  #deleting possible NA values
-  lista<-lista[!is.na(lista)]
-  return(as.vector(lista))
-}
-
-# --------------
-# loopAskDataBoth
-#---------------
-loopAskDataBoth<-function(text)
-{
-  str1 <- -1
-  str2 <- -1
-  l1 <-vector()
-  l2 <-vector()
-  
-  cat(text[[6]]) #MSG:VALORES POSITIVOS
-  while(str1 != 0)
-  {
-    cat(text[[5]]) #MSG:INTRODUZCA DATOS
-    str1 <-readline()
-    if(str1!=0 && str1!="") l1<-c(l1,str1)
-    # print(l1)
-  }
-  cat(text[[7]]) #MSG:VALORES NEGATIVOS
-  while(str2 != 0)
-  {
-    cat(text[[5]]) #MSG:INTRODUZCA DATOS
-    str2 <-readline()
-    if(str2!=0 && str2!="") l2<-c(l2,str2)
-    # print(l2)
-  }
-  #deleting possible NA values
-  l1<-l1[!is.na(l1)]
-  l2<-l2[!is.na(l2)]
-  
-  max.len = max(length(l1), length(l2))
-  x = c(l1, rep(NA, max.len - length(l1)))
-  y = c(l2, rep(NA, max.len - length(l2)))
-  
-  df = list(x=x, y=y)
-  attributes(df) = list(names = names(df),
-                        row.names=1:max(length(x), length(y)), class='data.frame')
-  names(df)<-c("Pos","Neg")
-  return(df)
-  
-}
-
-
-# -------------
-# handleFiles
-#--------------
-
-handleFiles<-function(opt,text,lang)
-{
-  dir<-paste(Sys.getenv("R_ROOT"),"/",lang,"/",sep="")
-  
-  if(opt==1) # pos
-  {
-    #Ask for new features
-    cat(text[[6]]) #MSG:VALORES POSITIVOS
-    l<-loopAskData(text)
-    
-    #loading corresponding file
-    titP<-paste("Pos_",lang,".csv",sep="")
-    pos <- read.csv(file=paste(dir,titP,sep=""))
-    
-    #adding new values
-    pos<- data.frame(lapply(pos, as.character), stringsAsFactors=FALSE)
-    pos<-c(pos[,1],t(l))
-    
-    #removing duplicates
-    pos <- pos[!duplicated(pos)]
-    
-    #saving changes
-    setwd(dir)
-    write.table(pos, file=titP, row.names=F,col.names=F)
-    pos<-read.csv(file=titP,header=F)
-    View(pos)
-    #MSG:ARCHIVOS GUARDADOS
-    cat(text[[8]])
-    
-  }
-  if(opt==2)# neg
-  {
-    #Ask for new features
-    cat(text[[7]]) #MSG:VALORES NEGATIVOS
-    l<-loopAskData(text)
-    
-    #loading corresponding file
-    titN<-paste("Neg_",lang,".csv",sep="")
-    neg <- read.csv(file=paste(dir,titN,sep=""))
-
-    #adding new values
-    neg<- data.frame(lapply(neg, as.character), stringsAsFactors=FALSE)
-    neg<-c(neg[,1],t(l))
-    
-    #removing duplicates
-    neg <- neg[!duplicated(neg)]
-    
-    #saving changes
-    setwd(dir)
-    write.table(neg, file=titN, row.names=F,col.names=F)
-    neg<-read.csv(file=titN,header=F)
-    View(neg)
-    #MSG:ARCHIVOS GUARDADOS
-    cat(text[[8]])
-  }
-  
-  if(opt==3) #both
-  {
-    #Ask for new features
-    df<-loopAskDataBoth(text)
-    
-    #loading corresponding file
-    titP<-paste("Pos_",lang,".csv",sep="")
-    pos <- read.csv(file=paste(dir,titP,sep=""))
-    #
-    titN<-paste("Neg_",lang,".csv",sep="")
-    neg <- read.csv(file=paste(dir,titN,sep=""))
-    
-    #adding new values
-    pos<- data.frame(lapply(pos, as.character), stringsAsFactors=FALSE)
-    pos<-c(pos[,1],t(df[,1]))
-    #
-    neg<- data.frame(lapply(neg, as.character), stringsAsFactors=FALSE)
-    neg<-c(neg[,1],t(df[,2]))
-    
-    #removing duplicates
-    pos <- pos[!duplicated(pos)]
-    neg <- neg[!duplicated(neg)]
-    
-    #saving changes
-    setwd(dir)
-    write.table(pos, file=titP, row.names=F,col.names=F)
-    write.table(neg, file=titN, row.names=F,col.names=F)
-  
-    pos<-read.csv(file=titP,header=F)
-    View(pos)
-    neg<-read.csv(file=titN,header=F)
-    View(neg)
-    #MSG:ARCHIVOS GUARDADOS
-    cat(text[[8]])
-  }
-}
+# 
+# # ----------------------------
+# # addDataToCorrespondingFile
+# #----------------------------
+# 
+# addDataToCorrespondingFile <-function(lang,file,text)
+# {
+#   handleFiles(file,text,lang)
+# }
+# 
+# # --------------
+# # loopAskData
+# #---------------
+# 
+# loopAskData<-function(text)
+# {
+#   str <- -1
+#   lista <-vector()
+#   while(str != 0)
+#   {
+#     cat(text[[5]]) #MSG:INTRODUZCA DATOS
+#     str <-readline()
+#     if(str!=0 && str!="") lista<-c(lista,str)
+#      # print(lista)
+#   }
+#   #deleting possible NA values
+#   lista<-lista[!is.na(lista)]
+#   return(as.vector(lista))
+# }
+# 
+# # --------------
+# # loopAskDataBoth
+# #---------------
+# loopAskDataBoth<-function(text)
+# {
+#   str1 <- -1
+#   str2 <- -1
+#   l1 <-vector()
+#   l2 <-vector()
+#   
+#   cat(text[[6]]) #MSG:VALORES POSITIVOS
+#   while(str1 != 0)
+#   {
+#     cat(text[[5]]) #MSG:INTRODUZCA DATOS
+#     str1 <-readline()
+#     if(str1!=0 && str1!="") l1<-c(l1,str1)
+#     # print(l1)
+#   }
+#   cat(text[[7]]) #MSG:VALORES NEGATIVOS
+#   while(str2 != 0)
+#   {
+#     cat(text[[5]]) #MSG:INTRODUZCA DATOS
+#     str2 <-readline()
+#     if(str2!=0 && str2!="") l2<-c(l2,str2)
+#     # print(l2)
+#   }
+#   #deleting possible NA values
+#   l1<-l1[!is.na(l1)]
+#   l2<-l2[!is.na(l2)]
+#   
+#   max.len = max(length(l1), length(l2))
+#   x = c(l1, rep(NA, max.len - length(l1)))
+#   y = c(l2, rep(NA, max.len - length(l2)))
+#   
+#   df = list(x=x, y=y)
+#   attributes(df) = list(names = names(df),
+#                         row.names=1:max(length(x), length(y)), class='data.frame')
+#   names(df)<-c("Pos","Neg")
+#   return(df)
+#   
+# }
+# 
+# 
+# # -------------
+# # handleFiles
+# #--------------
+# 
+# handleFiles<-function(opt,text,lang)
+# {
+#   dir<-paste(Sys.getenv("R_ROOT"),"/",lang,"/",sep="")
+#   
+#   if(opt==1) # pos
+#   {
+#     #Ask for new features
+#     cat(text[[6]]) #MSG:VALORES POSITIVOS
+#     l<-loopAskData(text)
+#     
+#     #loading corresponding file
+#     titP<-paste("Pos_",lang,".csv",sep="")
+#     pos <- read.csv(file=paste(dir,titP,sep=""))
+#     
+#     #adding new values
+#     pos<- data.frame(lapply(pos, as.character), stringsAsFactors=FALSE)
+#     pos<-c(pos[,1],t(l))
+#     
+#     #removing duplicates
+#     pos <- pos[!duplicated(pos)]
+#     
+#     #saving changes
+#     setwd(dir)
+#     write.table(pos, file=titP, row.names=F,col.names=F)
+#     pos<-read.csv(file=titP,header=F)
+#     View(pos)
+#     #MSG:ARCHIVOS GUARDADOS
+#     cat(text[[8]])
+#     
+#   }
+#   if(opt==2)# neg
+#   {
+#     #Ask for new features
+#     cat(text[[7]]) #MSG:VALORES NEGATIVOS
+#     l<-loopAskData(text)
+#     
+#     #loading corresponding file
+#     titN<-paste("Neg_",lang,".csv",sep="")
+#     neg <- read.csv(file=paste(dir,titN,sep=""))
+# 
+#     #adding new values
+#     neg<- data.frame(lapply(neg, as.character), stringsAsFactors=FALSE)
+#     neg<-c(neg[,1],t(l))
+#     
+#     #removing duplicates
+#     neg <- neg[!duplicated(neg)]
+#     
+#     #saving changes
+#     setwd(dir)
+#     write.table(neg, file=titN, row.names=F,col.names=F)
+#     neg<-read.csv(file=titN,header=F)
+#     View(neg)
+#     #MSG:ARCHIVOS GUARDADOS
+#     cat(text[[8]])
+#   }
+#   
+#   if(opt==3) #both
+#   {
+#     #Ask for new features
+#     df<-loopAskDataBoth(text)
+#     
+#     #loading corresponding file
+#     titP<-paste("Pos_",lang,".csv",sep="")
+#     pos <- read.csv(file=paste(dir,titP,sep=""))
+#     #
+#     titN<-paste("Neg_",lang,".csv",sep="")
+#     neg <- read.csv(file=paste(dir,titN,sep=""))
+#     
+#     #adding new values
+#     pos<- data.frame(lapply(pos, as.character), stringsAsFactors=FALSE)
+#     pos<-c(pos[,1],t(df[,1]))
+#     #
+#     neg<- data.frame(lapply(neg, as.character), stringsAsFactors=FALSE)
+#     neg<-c(neg[,1],t(df[,2]))
+#     
+#     #removing duplicates
+#     pos <- pos[!duplicated(pos)]
+#     neg <- neg[!duplicated(neg)]
+#     
+#     #saving changes
+#     setwd(dir)
+#     write.table(pos, file=titP, row.names=F,col.names=F)
+#     write.table(neg, file=titN, row.names=F,col.names=F)
+#   
+#     pos<-read.csv(file=titP,header=F)
+#     View(pos)
+#     neg<-read.csv(file=titN,header=F)
+#     View(neg)
+#     #MSG:ARCHIVOS GUARDADOS
+#     cat(text[[8]])
+#   }
+# }
 
 
 
