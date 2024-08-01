@@ -1,5 +1,5 @@
 # Load necessary functions, call: Sentiment_Files_Functions.R
-source(paste0(paste0(Sys.getenv("R_ROOT"),"/1-Emotions_categorization_files/"),"Sentiment_Files_Functions.R"))
+source(paste0(paste0(Sys.getenv("R_ROOT"),"/1-Emotions_categorization_files/"),"Sentiment_files_functions.R"))
 
 
 # Display language selection form

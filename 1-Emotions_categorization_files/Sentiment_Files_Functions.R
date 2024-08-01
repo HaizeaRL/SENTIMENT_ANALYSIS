@@ -229,7 +229,7 @@ display_adding_menu <- function(lang, msg){
 }
 
 # ----------------------
-# MENU ACTION HANDLERS
+# ACTION HANDLERS
 # handle_addings
 #-----------------------
 
