@@ -1,3 +1,4 @@
+options(warn=-1)
 
 # -----------------------
 #  package installation
@@ -11,11 +12,45 @@ packages <- list("plyr", "dplyr", "stringr", "ggplot2", "wordcloud", "reshape2",
 for (pck in packages) {
   if (!require(pck, character.only = TRUE)) {
     install.packages(pck, dependencies = TRUE)
-    library(pck, character.only = TRUE)
+    suppressWarnings(library(pck, character.only = TRUE))
   }
 }
 
 # twitteR
+
+
+# -----------------
+# get_integer_input
+# -----------------
+
+get_integer_input <- function(prompt_message, lang =NULL) {
+  
+  #' Function that validates whether the entered option is numeric.
+  #' If an incorrect input is entered, a message prompts the user to input a correct value.
+  #' @return integer
+  #' This function returns the correctly entered number.
+  #' @examples
+  #' # Example usage:
+  #' get_integer_input(option =1)  # Prompts the user to enter a number, returning correct option
+  #' 
+  
+  while (TRUE) {
+    user_input <- readline(prompt = prompt_message)
+    
+    # Check if the input is numeric and a whole number
+    if (grepl("^-?\\d+$", user_input)) {
+      return(as.integer(user_input))
+    }else if (!is.null(lang)){
+      if(lang=="ES"){
+        cat("Valor introducido es incorrecto. Por favor introduzca un valor valido.\n")
+      }else if(lang =="EN"){
+        cat("Invalid input. Please enter a valid number.\n")
+      }
+    }else{
+      cat("Invalid input. Please enter a valid number.\n")
+    }
+  }
+}
 
 # -----------------
 # determine_language
@@ -60,10 +95,10 @@ msg_data_checker <- function(lang){
   if(!dir.exists(file.path(file_path))){
     if(lang == "EN"){
       text = "English"
-      ctext <- sprintf("There are no %s messages to analyze!!\nPlease perform a message search. You can use the script: `2.1- Message_searching.R` for this purpose.", text)
+      ctext <- sprintf("Folder: `MSG_EN` missing, there are no %s messages to analyze.\nPlease perform a message search. You can use the script: `2.1- Message_searching.R` for this purpose.", text)
     }else if(lang == "ES"){
       text = "Español"
-      ctext <- sprintf("¡¡No existen mensajes en idioma %s para analizar!!\nPor favor realiza la búsqueda de mensajes. Puede valerse del script: `2.1- Message_searching.R` para ello.\n", text)
+      ctext <- sprintf("Falta la carpeta: `MSG_ES`, no existen mensajes en idioma %s para analizar.\nPor favor realiza la búsqueda de mensajes. Puede valerse del script: `2.1- Message_searching.R` para ello.\n", text)
     } 
   } 
   if (!is.null(ctext)){
@@ -95,8 +130,13 @@ category_data_checker <- function(lang){
   ctext <- NULL
   file_path = paste(Sys.getenv("R_ROOT"),lang,sep="/")
   if(!dir.exists(file.path(file_path))){
-    if(lang == "EN") ctext <-"No sentiment categories have been created!!.\nPlease run the script: `1- Emotions_files_creation.R`to create."
-    if(lang == "ES") ctext <-"¡¡No se han creado categorías de sentimientos!!\nPor favor, ejecute el script: `1- Emotions_files_creation.R para crearlas.\n"
+    if(lang == "EN"){
+      text = "English"
+      ctext <-sprintf("No %s sentiment categories have been created.\nPlease run the script: `1- Emotions_files_creation.R`to create.",text)
+    }else if(lang == "ES"){
+      text = "Español"
+      ctext <-sprintf("No se han creado categorías de sentimientos en %s.\nPor favor, ejecute el script: `1- Emotions_files_creation.R para crearlas.\n",text)
+    }
   } 
   if (!is.null(ctext)){
     cat(ctext)
@@ -124,24 +164,36 @@ get_exception_msgs<-function(lang, file_full_path ,e){
   aux <-list()
   if(lang=="ES"){
     
-    aux[[1]]<-sprintf("Error leyendo fichero: %s \n",file_full_path)
-    aux[[2]]<-sprintf("Mensaje de error: %s \nIntentando abrir con encoding UTF-8-BOM ...\n",e$message)
-    aux[[3]]<-sprintf("Error abriendo fichero: %s en el segundo intento\n",file_full_path)
+    aux[[1]]<-sprintf("Error leyendo fichero: %s",file_full_path)
+    aux[[2]]<-sprintf("Mensaje de error: %s.Abriendo con encoding UTF-8-BOM ...",e$message)
+    aux[[3]]<-sprintf("Error abriendo fichero: %s en el segundo intento",file_full_path)
     aux[[4]]<-sprintf("Mensaje de error: %s \n",e$message)
   }
   else {
-    aux[[1]]<-sprintf("Error reading file: %s \n",file_full_path)
-    aux[[2]]<-sprintf("Error message: %s \nTrying again with UTF-8-BOM encoding...\n",e$message)
-    aux[[3]]<-sprintf("Second attempt failed for file: %s \n",file_full_path)
+    aux[[1]]<-sprintf("Error reading file: %s",file_full_path)
+    aux[[2]]<-sprintf("Error message: %s.Reading with UTF-8-BOM encoding...",e$message)
+    aux[[3]]<-sprintf("Second attempt failed for file: %s",file_full_path)
     aux[[4]]<-sprintf("Error message: %s \n",e$message)
   }
   
   return(aux)
 }
 
-
-
-
+# Function to print colored text
+cat_colored <- function(text, color) {
+  
+  #' TODO
+  #' 
+  #' 
+  
+  colors <- list(
+    red = "\033[31m",
+    green = "\033[32m",
+    reset = "\033[0m"
+  )
+  
+  cat(colors[[color]], text, colors$reset, "\n", sep = "")
+}
 
 # -----------------
 # join_all_files
@@ -164,6 +216,12 @@ join_all_files <- function(file_path,lang){
   all<-NULL
   if(dir.exists(file_path)){
     
+    if(lang=="ES"){
+      cat("Leyendo y juntando todos los mensajes a analizar...\n")
+    }else if(lang =="EN"){
+      cat("Reading and gathering all the messages to be analyzed...\n")
+    }
+    
     # open all searched files
     myFiles <- list.files(path=file_path,pattern="*_stack.csv")
 
@@ -179,13 +237,13 @@ join_all_files <- function(file_path,lang){
       }, error = function(e) {
         # recover messages to prompt in corresponding language
         msg <- get_exception_msgs(lang, file_full_path, e )
-        cat(msg[[1]])
-        cat(msg[[2]])
+        cat_colored(msg[[1]],"red")
+        cat_colored(msg[[2]],"red")
         tryCatch({
           suppressWarnings(read.csv(file=file_full_path, fileEncoding="UTF-8-BOM"))
         }, error = function(e) {
-          cat(msg[[3]])
-          cat(msg[[4]])
+          cat_colored(msg[[3]],"red")
+          cat_colored(msg[[4]],"red")
           return(NULL)
         })
       })
@@ -211,16 +269,20 @@ lat_long_check <- function(all,lang){
   #' # Example usage:
   #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
   #'
-  
-
+  #'
   # determine msg num. with lat, log data
   sum_lat_lon<-sum(is.na(all[,2]))
   text <- NULL
-  if(lang == "EN"){
-    text <-sprintf("Only %d from %d messages have geolocalization data!!\n Loading default geolocalization data as demo.",(nrow(all)-sum_lat_lon),nrow(all))
-  }
-  else if(lang == "ES"){
-    text <-sprintf("Solo %d mensajes de %d presentan datos de geolocalización!!\nCargando datos de geolocalización de por defecto como demo.",(nrow(all)-sum_lat_lon),nrow(all))
+  if(lang == "EN" & (nrow(all)-sum_lat_lon) < nrow(all)){
+    cat("Proceeding to analyze geolocation data...\n")
+    text <-sprintf("Only %d from %d messages have geolocalization data!!\nLoading default geolocalization data as demo...\n",(nrow(all)-sum_lat_lon),nrow(all))
+  }else if(lang == "EN" & (nrow(all)-sum_lat_lon) == nrow(all)){
+    text <-sprintf("Geolocation data added.\n")
+  }else if(lang == "ES" & (nrow(all)-sum_lat_lon) < nrow(all)){
+    cat("Procediendo a analizar datos de geolocalización...\n")
+    text <-sprintf("Solo %d mensajes de %d presentan datos de geolocalización!!\nCargando datos de geolocalización de por defecto como demo...\n",(nrow(all)-sum_lat_lon),nrow(all))
+  }else if(lang == "ES" & (nrow(all)-sum_lat_lon) == nrow(all)){
+    text <-sprintf("Datos de geolocalización añadidos.\n")
   }
   
   if (!is.null(text)){
@@ -228,6 +290,170 @@ lat_long_check <- function(all,lang){
   }
   return (text)
 
+}
+
+# ------------------
+#  update_matches 
+#------------------
+update_matches <- function(lang, matches, words, df, df_geo, aux, i, categoria) {
+  
+  #' TODO
+  #' 
+  
+  # Check if there are any non-NA matches
+  if (sum(!is.na(matches)) > 0) {
+    
+    # Extract the term(s) corresponding to the non-NA matches
+    term <- words[!is.na(matches)]
+    
+    # Extract the term(s) corresponding to the non-NA matches
+    terms <- words[!is.na(matches)]
+    
+    for (term in terms) {
+      if (term %in% df[, 1]) {
+        # Term exists in the data frame, update its count
+        pos <- grep(term, df[, 1])
+        df[pos, 2] <- df[pos, 2] + sum(!is.na(matches))
+        
+        # Update the geographic data frame if coordinates match
+        if ((df_geo[, "lon"] == aux[i, "longitude"]) && (df_geo[, "lat"] == aux[i, "latitude"])) {
+          pos_geo <- grep(term, df_geo[, 1])
+          if (length(pos_geo) > 0) {
+            df_geo[pos_geo, 2] <- df_geo[pos_geo, 2] + sum(!is.na(matches))
+          }
+        }
+      } else {
+        # Term does not exist in the data frame, add it
+        df <- rbind(df, data.frame(word = term, cuantos = sum(!is.na(matches))))
+        
+        # Add to geographic data frame
+        df_geo <- rbind(df_geo, data.frame(word = term, cuantos = sum(!is.na(matches)), 
+                                           lon = aux[i, "longitude"], lat = aux[i, "latitude"], 
+                                           name = aux[i, "name"], categoria = categoria))
+      }
+    }
+  }
+  
+  # Return the updated data frames as a list
+  return(list(df = df, df_geo = df_geo))
+}
+
+# ------------------
+#  organize_data 
+# ------------------
+
+organize_data <- function(df_geo, df_p, df_n) {
+  
+  #' TODO
+  #' 
+  
+  # Initialize the list and the vector for missing data indicators
+  l <- list()
+  noDatapos <- vector()
+  
+  # Check if df_geo is provided and not empty
+  if (length(df_geo) != 0) {
+    l[[1]] <- df_geo
+  } else {
+    noDatapos <- c(noDatapos, 1)  # Indicate that df_geo is missing
+  }
+  
+  # Check if df_p is provided and not empty
+  if (length(df_p) != 0) {
+    l[[2]] <- df_p
+  } else {
+    noDatapos <- c(noDatapos, 2)  # Indicate that df_p is missing
+  }
+  
+  # Check if df_n is provided and not empty
+  if (length(df_n) != 0) {
+    l[[3]] <- df_n
+  } else {
+    noDatapos <- c(noDatapos, 3)  # Indicate that df_n is missing
+  }
+  
+  # Add missing values indicator to the list if there are any missing
+  if (length(noDatapos) != 0) {
+    l[[4]] <- noDatapos
+  }
+  
+  return(l)
+}
+
+# ------------------
+#  score_sentiment 
+#------------------
+
+#evaluation tweets function
+score_sentiment <- function(sentences, pos_words, neg_words, lang){
+  
+  #' TODO
+  #' 
+  #' Determine corresponding language characters from selected option
+  #' Check if needed data is presented. Ask for its creation if not.
+  #' Realize sentiment analisis a display results in corresponding language.
+  #' 
+  #' @param option 
+  #'   1 directs to Spanish sentiment analysis actions
+  #'   2 directs to English sentiment analysis actions
+  #'   0 close program
+  #' @return NULL 
+  #' This function does not return a value but redirect to corresponding actions.
+  #' @examples
+  #' # Example usage:
+  #' handle_language_options(option =1)  # redirect to Spanish sentiment analysis
+  #'
+  
+  df_p<-NULL
+  df_n<-NULL
+  df_geo <-NULL
+  aux<-sentences
+  sentences<-sentences$text
+  for(i in 1:length(sentences)){
+    
+    #' Clean text:
+    #'  - Remove punctuation
+    #'  - Remove control characters
+    #'  - Remove digits
+    #'  - Replace multiple spaces with a single space
+    #'  - Convert encoding to UTF-8
+    #'  - Convert to lowercase
+    
+    if (lang =="ES"){
+      print(paste("Quedan ", length(sentences)-i, " textos por analizar.", sep=""))
+    }else if(lang =="EN"){
+      print(paste(length(sentences)-i, " texts remain to be analyzed.", sep=""))
+    }
+    
+    sentence <- sentences[i]
+    sentence <- gsub('[[:punct:]]', "", sentence)
+    sentence <- gsub('[[:cntrl:]]', "", sentence)
+    sentence <- gsub('[[:digit:]]', "", sentence)
+    sentence <- gsub('[[:space:]]+', " ", sentence)
+    sentence <- iconv(sentence, from = "latin1", to = "UTF-8", sub = "")
+    sentence <- tolower(sentence)
+    
+    # split sentence in words
+    word_list <- str_split(sentence, ' ')
+    words <- unlist(word_list)
+    
+    # check sentiments in words
+    pos_matches<-match(words, tolower(unlist(pos_words)))
+    neg_matches<-match(words, tolower(unlist(neg_words)))
+    
+    # check for possitive matches
+    result_pos  =  update_matches(lang, pos_matches, words, df_p, df_geo, aux, i, "p") 
+    df_p = result_pos$df
+    df_geo = result_pos$df_geo
+    
+    # check for negative matches
+    result_neg  =  update_matches(lang, neg_matches, words, df_n, df_geo, aux, i, "n") 
+    df_n = result_neg$df
+    df_geo = result_neg$df_geo
+    
+  }
+  # organize data
+  return (organize_data(df_geo, df_p, df_n))
 }
 
 # ----------------------
@@ -276,8 +502,31 @@ handle_main_actions<-function(option){
       if (!is.null(all)){
 
         # check for latitude and longitude data and added default values if corresponds
-        lat_lon <- lat_long_check(all, lang)
+        lat_long_check(all, lang)
         
+        # get default country file 
+        cty<-read.csv(paste(Sys.getenv("R_ROOT"),"countries.csv", sep="/"),sep=";",stringsAsFactors = F,dec=".")
+         
+        # Add default longitude and latitude data to data  
+        all[,"longitude"]<-sample(cty[,"longitude"],nrow(all),replace=T)
+        all[,"latitude"]<-sample(cty[,"latitude"],nrow(all),replace=T)
+        all[,"name"]<-sample(cty[,"name"],nrow(all),replace=T)
+        lat_long_check(all, lang)
+        
+        # redirect to sentiment files
+        terms_path = paste(Sys.getenv("R_ROOT"),lang,sep="/")
+        pos_term_file = paste0(paste0("Pos_",lang),".csv")
+        neg_term_file = paste0(paste0("Neg_",lang),".csv")
+        
+        # read corresponding files
+        pos_terms = read.csv(paste(terms_path,pos_term_file,sep ="/"))
+        neg_terms = read.csv(paste(terms_path,neg_term_file,sep ="/"))
+        
+        # organize, sentiments score by possitive and negative sentimens
+        scores <- score_sentiment(all, pos_terms, neg_terms,lang)
+       
+        # handle scores results
+        handle_scores(scores, lang)
       }
       
     }
@@ -326,6 +575,70 @@ handle_language_options<-function(option){
   
   return(FALSE)  # exit the loop
 }
+
+# ----------------------
+# handle_scores
+#-----------------------
+
+handle_scores <- function(scores, lang) {
+  
+  #' TODO
+  #'
+  
+  # Define language-specific strings
+  lang_strings <- list(
+    ES = list(positive = "POSITIVOS", negative = "NEGATIVOS", 
+              no_geoloc = "NO EXISTEN COINCIDENCIAS DE GEOLOCALIZACION\n",
+              no_positive = "NO EXISTEN COINCIDENCIAS DE CATEGORIAS POSITIVAS\n",
+              no_negative = "NO EXISTEN COINCIDENCIAS DE CATEGORIAS NEGATIVAS\n"),
+    EN = list(positive = "POSITIVES", negative = "NEGATIVES", 
+              no_geoloc = "NO GEOLOCALIZATION COINCIDENCIES\n",
+              no_positive = "NO POSITIVE CATEGORIES COINCIDENCIES\n",
+              no_negative = "NO NEGATIVE CATEGORIES COINCIDENCIES\n")
+  )
+  
+  # Select the appropriate strings based on the language
+  strings <- lang_strings[[lang]]
+  
+  # Initialize flags and message text
+  geol <- posi <- nega <- 1
+  mtext <- ""
+  
+  # Handle the case where some data is missing
+  if (length(scores) == 4) {
+    for (i in seq_along(scores[[4]])) {
+      switch(scores[[4]][i],
+             `1` = {
+               mtext <- paste(mtext, strings$no_geoloc)
+               geol <- 0
+             },
+             `2` = {
+               mtext <- paste(mtext, strings$no_positive)
+               posi <- 0
+             },
+             `3` = {
+               mtext <- paste(mtext, strings$no_negative)
+               nega <- 0
+             }
+      )
+    }
+    
+    # Print the missing data message if any
+    if (nchar(mtext) > 0) cat(mtext)
+    
+    # Plot results based on flags
+    if (posi == 1) plotTermPositiveResults(scores[[2]], strings$positive, lang, "darkgreen")
+    if (nega == 1) plotTermNegativeResults(scores[[3]], strings$negative, lang, "darkred")
+    if (geol == 1) geoResults(scores[[1]], lang)
+    
+  } else {
+    # Handle the case where all data is present
+    plotTermPositiveResults(scores[[2]], strings$positive, lang, "darkgreen")
+    plotTermNegativeResults(scores[[3]], strings$negative, lang, "darkred")
+    geoResults(scores[[1]], lang)
+  }
+}
+
 
 
 
@@ -498,92 +811,6 @@ plotTermNegativeResults <-function(terms,str,lang,color)
 
 
 
-# ------------------
-#  score.sentiment 
-#------------------
-
-#evaluation tweets function
-score.sentiment <- function(sentences, pos.words, neg.words)
-{
-  df_p<-NULL
-  df_n<-NULL
-  df_geo <-NULL
-  aux<-sentences
-  sentences<-sentences$text
-  for(i in 1:length(sentences))
-  {
-    print(paste("Quedan ", length(sentences)-i, " textos", sep=""))
-    sentence <- gsub('[[:punct:]]', "", sentences[i])
-    sentence <- gsub('[[:cntrl:]]', "", sentences[i])
-    sentence <- gsub('[[:digit:]]', "", sentences[i])
-    sentence <-gsub('[[:space:]]', " ", sentences[i])
-    sentence <- tolower(sentences[i])
-    word.list <- str_split(sentences[i], ' ')
-    words <- unlist(word.list)
-    pos.matches<-match(words, tolower(unlist(pos.words)))
-    neg.matches<-match(words, tolower(unlist(neg.words)))
-    
-    if(sum(!is.na(pos.matches))>0)
-    {
-      term<-words[!is.na(pos.matches)]
-      if((term %in% df_p[,1]))
-      {
-        pos<-grep(term,df_p[,1])
-        df_p[pos,2]<-df_p[pos,2]+sum(!is.na(pos.matches))
-        if((df_geo[,"lon"] == aux[i,"longitude"]) && (df_geo[,"lat"] == aux[i,"latitude"]))
-        {
-          pos<-grep(term,df_geo[,1])
-          df_geo[pos,2]<-df_geo[pos,2]+sum(!is.na(pos.matches))
-        }
-      }
-      else {
-        df_p<- rbind(df_p,data.frame(word=term,cuantos=sum(!is.na(pos.matches))))
-        df_geo<-rbind(df_geo,data.frame(word=term,cuantos=sum(!is.na(pos.matches)),lon=aux[i,"longitude"],lat=aux[i,"latitude"],name=aux[i,"name"],categoria="p"))            
-      }
-    }
-    
-    if(sum(!is.na(neg.matches))>0)
-    {
-      term<-words[!is.na(neg.matches)]
-      if((term %in% df_n[,1]))
-      {
-        pos<-grep(term,df_n[,1])
-        df_n[pos,2]<-df_n[pos,2]+sum(!is.na(neg.matches))
-        if((df_geo[,"lon"] == aux[i,"longitude"]) && (df_geo[,"lat"] == aux[i,"latitude"]))
-        {
-          pos<-grep(term,df_geo[,1])
-          df_geo[pos,2]<-df_geo[pos,2]+sum(!is.na(neg.matches))
-        }
-      }
-      else {
-        df_n<- rbind(df_n,data.frame(word=term,cuantos=sum(!is.na(neg.matches))))
-        df_geo<- rbind(df_geo,data.frame(word=term,cuantos=sum(!is.na(neg.matches)),lon=aux[i,"longitude"],lat=aux[i,"latitude"],name=aux[i,"name"],categoria="n"))
-      }
-      
-    }
-    # # scan(n=1)
-    # print(df_p)
-    # print(df_n)
-  }
-  l<-list()
-  noDatapos <-vector()
-  #geo table
-  if(length(df_geo)!=0)   l[[1]]<-df_geo
-  if(length(df_geo)==0)   noDatapos <- c(noDatapos,1)
-  
-  #positive term table
-  if(length(df_p)!=0)   l[[2]]<-df_p
-  if(length(df_p)==0)   noDatapos <- c(noDatapos,2)
-  
-  #negative term table
-  if(length(df_n)!=0)   l[[3]]<-df_n
-  if(length(df_n)==0)   noDatapos <- c(noDatapos,3)
-  
-  #missing values
-  if(length(noDatapos)!=0) l[[4]]<-noDatapos
-  return(l)
-  
-}
 
 
 # ------------------
