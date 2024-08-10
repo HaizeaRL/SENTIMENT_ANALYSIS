@@ -6,7 +6,7 @@ options(warn=-1)
 
 # library list
 packages <- list("plyr", "dplyr", "stringr", "ggplot2", "wordcloud", "reshape2",
-                 "png", "tcltk", "ggmap", "RColorBrewer")
+                 "png", "tcltk", "ggmap", "RColorBrewer","grid")
 
 # Install packages if not already installed and load them
 for (pck in packages) {
@@ -274,13 +274,13 @@ lat_long_check <- function(all,lang){
   sum_lat_lon<-sum(is.na(all[,2]))
   text <- NULL
   if(lang == "EN" & (nrow(all)-sum_lat_lon) < nrow(all)){
-    cat("Proceeding to analyze geolocation data...\n")
-    text <-sprintf("Only %d from %d messages have geolocalization data!!\nLoading default geolocalization data as demo...\n",(nrow(all)-sum_lat_lon),nrow(all))
+    cat("Proceeding to analyze geolocation data.\n")
+    text <-sprintf("Only %d from %d messages have geolocalization data!!\nLoading default geolocalization data as demo.\n",(nrow(all)-sum_lat_lon),nrow(all))
   }else if(lang == "EN" & (nrow(all)-sum_lat_lon) == nrow(all)){
     text <-sprintf("Geolocation data added.\n")
   }else if(lang == "ES" & (nrow(all)-sum_lat_lon) < nrow(all)){
-    cat("Procediendo a analizar datos de geolocalización...\n")
-    text <-sprintf("Solo %d mensajes de %d presentan datos de geolocalización!!\nCargando datos de geolocalización de por defecto como demo...\n",(nrow(all)-sum_lat_lon),nrow(all))
+    cat("Procediendo a analizar datos de geolocalización.\n")
+    text <-sprintf("Solo %d mensajes de %d presentan datos de geolocalización!!\nCargando datos de geolocalización de por defecto como demo.\n",(nrow(all)-sum_lat_lon),nrow(all))
   }else if(lang == "ES" & (nrow(all)-sum_lat_lon) == nrow(all)){
     text <-sprintf("Datos de geolocalización añadidos.\n")
   }
@@ -382,7 +382,7 @@ organize_data <- function(df_geo, df_p, df_n) {
 
 # ------------------
 #  score_sentiment 
-#------------------
+# ------------------
 
 #evaluation tweets function
 score_sentiment <- function(sentences, pos_words, neg_words, lang){
@@ -409,6 +409,13 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
   df_geo <-NULL
   aux<-sentences
   sentences<-sentences$text
+  
+  if (lang =="ES"){
+    cat(sprintf("Analizando %d textos...", length(sentences)))
+  }else if(lang =="EN"){
+    cat(sprintf("Analyizing %d texts...", length(sentences)))
+  }
+  
   for(i in 1:length(sentences)){
     
     #' Clean text:
@@ -418,12 +425,6 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
     #'  - Replace multiple spaces with a single space
     #'  - Convert encoding to UTF-8
     #'  - Convert to lowercase
-    
-    if (lang =="ES"){
-      print(paste("Quedan ", length(sentences)-i, " textos por analizar.", sep=""))
-    }else if(lang =="EN"){
-      print(paste(length(sentences)-i, " texts remain to be analyzed.", sep=""))
-    }
     
     sentence <- sentences[i]
     sentence <- gsub('[[:punct:]]', "", sentence)
@@ -453,8 +454,93 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
     
   }
   # organize data
+  if (lang =="ES"){
+    cat("\nTextos analizados. Mostrando resultados.")
+  }else if(lang =="EN"){
+    cat("\nTexts analyzed. Showing results.")
+  }
+  
   return (organize_data(df_geo, df_p, df_n))
 }
+
+# ------------------------
+#  plot_term_results 
+#-------------------------
+plot_term_results <-function(terms,str,lang,color){
+  
+  #' TODO!!
+  #' 
+  #' Determine corresponding language characters from selected option
+  
+  
+  # Create corresponding result folder if it doesn't exist
+  results_folder <- file.path(Sys.getenv("R_ROOT"), "RESULTS")
+  
+  if (!dir.exists(results_folder)) {
+    dir.create(results_folder, recursive = TRUE, showWarnings = FALSE)
+  }
+  
+  # Set PDF title based on language
+  if (lang == "EN") {
+    pdf_title <- paste0(str, "_TERM_INSTANCES.pdf")
+    plot_title <- paste0(str, "_TERM_INSTANCES")
+  } else if (lang == "ES") {
+    pdf_title <- paste0("INSTANCIAS_TERMINOS_", str, ".pdf")
+    plot_title <- paste0("INSTANCIAS_TERMINOS_", str)
+  }
+  
+  # Create wordcloud with the corresponding color 
+  wordcloud(terms$word, terms$cuantos, random.order = FALSE, colors = color)
+  
+  # and save it as PNG
+  wordcloud_img_path <- file.path(results_folder, paste0("WORDCLOUD_",str,".png"))
+  dev.copy(png,wordcloud_img_path)
+  dev.off()
+  
+  # Convert the word cloud image to a grob
+  wordcloud_img <- readPNG(wordcloud_img_path)
+  wordcloud_grob <- rasterGrob(wordcloud_img, width = unit(3, "inches"), height = unit(3, "inches")) 
+  
+  # Calculate the max value and default step size
+  max_value <- max(terms[, 2], na.rm = TRUE)
+  
+  # Obtain default break points
+  default_breaks <- scales::pretty_breaks(n = 5)(c(0, max_value))
+  step_size <- default_breaks[2] - default_breaks[1]
+  
+  # Calculate the next step limit
+  y_limit <- ceiling(max_value / step_size) * step_size
+  
+  # Create ggplot object for the term appearance plot
+  p.example <- ggplot(terms, aes(x = terms[, 1], y = terms[, 2])) +
+    geom_point(color = color, size = 3) +
+    ggtitle(plot_title) +  # Add title 
+    labs(y = "Count", x = "Terms") +  # Label axes
+    ylim(0, y_limit) +  # Set y-axis limits dynamically
+    theme_minimal() +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 10),   # Center the title and set size to 10
+      axis.title.y = element_text(size = 10),              # Set y-axis title text size to 10
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 10),  # Set x-axis text size to 10
+      axis.text.y = element_text(size = 10),               # Set y-axis text size to 10
+      axis.line.x = element_line(color = "black"),
+      axis.line.y = element_line(color = "black")
+    ) + 
+    annotation_custom(
+      wordcloud_grob,
+      xmin = 0, xmax = 7, ymin = Inf, ymax = 0
+    )
+  
+  pdf(file = file.path(results_folder, pdf_title), width = 14, height = 6, onefile = TRUE, paper = "a4r")
+  print(p.example)
+  dev.off()
+  
+  # Show the PDF file
+  file.show(file.path(results_folder, pdf_title))
+
+}
+
+
 
 # ----------------------
 # ACTION HANDLERS
@@ -601,7 +687,7 @@ handle_scores <- function(scores, lang) {
   strings <- lang_strings[[lang]]
   
   # Initialize flags and message text
-  geol <- posi <- nega <- 1
+  geo <- pos <- neg <- 1
   mtext <- ""
   
   # Handle the case where some data is missing
@@ -610,15 +696,15 @@ handle_scores <- function(scores, lang) {
       switch(scores[[4]][i],
              `1` = {
                mtext <- paste(mtext, strings$no_geoloc)
-               geol <- 0
+               geo <- 0
              },
              `2` = {
                mtext <- paste(mtext, strings$no_positive)
-               posi <- 0
+               pos <- 0
              },
              `3` = {
                mtext <- paste(mtext, strings$no_negative)
-               nega <- 0
+               neg <- 0
              }
       )
     }
@@ -627,15 +713,15 @@ handle_scores <- function(scores, lang) {
     if (nchar(mtext) > 0) cat(mtext)
     
     # Plot results based on flags
-    if (posi == 1) plotTermPositiveResults(scores[[2]], strings$positive, lang, "darkgreen")
-    if (nega == 1) plotTermNegativeResults(scores[[3]], strings$negative, lang, "darkred")
-    if (geol == 1) geoResults(scores[[1]], lang)
+    if (pos == 1) plot_term_results(scores[[2]], strings$positive, lang, "darkgreen")
+    if (neg == 1) plot_term_results(scores[[3]], strings$negative, lang, "darkred")
+    #if (geo == 1) geoResults(scores[[1]], lang)
     
   } else {
     # Handle the case where all data is present
-    plotTermPositiveResults(scores[[2]], strings$positive, lang, "darkgreen")
-    plotTermNegativeResults(scores[[3]], strings$negative, lang, "darkred")
-    geoResults(scores[[1]], lang)
+    plot_term_results(scores[[2]], strings$positive, lang, "darkgreen")
+    plot_term_results(scores[[3]], strings$negative, lang, "darkred")
+    #geoResults(scores[[1]], lang)
   }
 }
 
@@ -698,116 +784,6 @@ handle_scores <- function(scores, lang) {
 # }
 
 
-# ------------------
-#  plotTermPositiveResults 
-#------------------
-plotTermPositiveResults <-function(terms,str,lang,color)
-{
-  dirGraph <- paste(Sys.getenv("R_ROOT"),"/Graphs/",sep="")
-  if(!dir.exists(dirGraph))
-    dir.create(dirGraph,recursive=T)
-  setwd(dirGraph)
-  
-  if(lang =="EN")
-  {
-    t<-paste(str, " TERMS RESULTS")
-    pdftitle <- paste(t,".pdf")
-  }
-  
-  if(lang =="ES")
-  {
-    t<-paste("RESULTADOS DE TERMINOS ",str)
-    pdftitle <- paste(t,".pdf")
-  }
-  
-  while (TRUE)
-  {
-    if(file.exists(pdftitle))
-      pdftitle <- paste(" - ", pdftitle)
-    else
-      break
-  }
-  
-  #create png
-  wordcloud(terms$word,terms$cuantos, random.order=FALSE,color=color)
-  dev.copy(png,paste(str,".png",sep=""),width=3.25,height=3.25,units="in",res=1500)
-  dev.off()
-  dev.off()
-  
-  mypng = readPNG(paste(str,".png",sep=""))
-  
-  #PLOTTING
-  par(mar=c(6,3,3,2.5), mfrow =c(1,1))
-  p.example = qplot(terms[,1],terms[,2],main =t,xlab="",ylab="", colour = I(color),size=I(5.5),ylim=c(0,max(terms[,2])))+
-    theme(text = element_text(size=20),axis.text.x = element_text(angle = 45, hjust = 1))+
-    theme(axis.line.x = element_line(color="black"),
-          axis.line.y = element_line(color="black"),
-          panel.background = element_blank()) +
-    annotation_raster(mypng, ymin = 90, ymax= 250, xmin = 16, xmax = 22)
-  
-  pdf(pdftitle ,width=14,height=12/2, onefile=TRUE, paper="a4r")
-  print(p.example)
-  dev.off()
-  dev.off()
-  
-  file.show(pdftitle)
-  
-}
-
-# ------------------------------
-#  plotTermNegativeResults 
-#------------------------------
-plotTermNegativeResults <-function(terms,str,lang,color)
-{
-  dirGraph <- paste(Sys.getenv("R_ROOT"),"/Graphs/",sep="")
-  if(!dir.exists(dirGraph))
-    dir.create(dirGraph,recursive=T)
-  setwd(dirGraph)
-  
-  if(lang =="EN")
-  {
-    t<-paste(str, " TERMS RESULTS")
-    pdftitle <- paste(t,".pdf")
-  }
-  
-  if(lang =="ES")
-  {
-    t<-paste("RESULTADOS DE TERMINOS ",str)
-    pdftitle <- paste(t,".pdf")
-  }
-  
-  while (TRUE)
-  {
-    if(file.exists(pdftitle))
-      pdftitle <- paste(" - ", pdftitle)
-    else
-      break
-  }
-  
-  #create png
-  wordcloud(terms$word,terms$cuantos, random.order=FALSE,color=color)
-  dev.copy(png,paste(str,".png",sep=""),width=3.25,height=3.25,units="in",res=1500)
-  dev.off()
-  dev.off()
-  
-  mypng = readPNG(paste(str,".png",sep=""))
-  
-  #PLOTTING
-  par(mar=c(6,3,3,2.5), mfrow =c(1,1))
-  p.example = qplot(terms[,1],terms[,2],main =t,xlab="",ylab="", colour = I(color),size=I(5.5),ylim=c(0,max(terms[,2])))+
-    theme(text = element_text(size=20),axis.text.x = element_text(angle = 45, hjust = 1))+
-    theme(axis.line.x = element_line(color="black"),
-          axis.line.y = element_line(color="black"),
-          panel.background = element_blank())+ 
-    annotation_raster(mypng, ymin = max(terms[,2])-10, ymax= max(terms[,2]), xmin = length(terms[,1])-4, xmax = length(terms[,1]))
-  pdf(pdftitle ,width=14,height=12/2, onefile=TRUE, paper="a4r")
-  print(p.example)
-  dev.off()
-  dev.off()
-  
-  file.show(pdftitle)
-  
-}
 
 
 
