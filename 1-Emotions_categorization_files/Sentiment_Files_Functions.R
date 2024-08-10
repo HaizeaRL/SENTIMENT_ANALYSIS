@@ -19,6 +19,40 @@ default_sentiment_dict <- list(
 )
 
 # -----------------
+# get_integer_input
+# -----------------
+
+get_integer_input <- function(option, lang = NULL) {
+  
+  #' Function that validates whether the entered option is numeric.
+  #' If an incorrect input is entered, a message prompts the user to input a correct value.
+  #' @return integer
+  #' This function returns the correctly entered number.
+  #' @examples
+  #' # Example usage:
+  #' get_integer_input(option =1)  # Prompts the user to enter a number, returning correct option
+  #' 
+  
+  while (TRUE) {
+    user_input <- readline(prompt = option)
+    
+    # Check if the input is numeric and a whole number
+    if (grepl("^-?\\d+$", user_input)) {
+      return(as.integer(user_input))
+    }else if (!is.null(lang)){
+      if(lang=="ES"){
+        cat("Valor introducido es incorrecto. Por favor introduzca un valor valido.\n")
+      }else if(lang =="EN"){
+        cat("Invalid input. Please enter a valid number.\n")
+      }
+    }else{
+      cat("Invalid input. Please enter a valid number.\n")
+    }
+    
+  }
+}
+
+# -----------------
 # determine_language
 # -----------------
 
@@ -184,7 +218,7 @@ display_which_file_menu <- function(lang, msg){
     cat(paste0("3:",paste0(msg[[6]][3],"\n")))
     
     # Read user input
-    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
+    user_input <- get_integer_input(cat(msg[[13]]))
     
     # Handle the user's choice and determine whether to continue or exit
     if (!handle_file_option(user_input, lang, msg)) {
@@ -219,7 +253,7 @@ display_adding_menu <- function(lang, msg){
     cat(paste0("2:",paste0(msg[[4]][2],"\n")))
     
     # Read user input
-    user_input <- as.integer(readline(prompt = cat(msg[[13]])))
+    user_input <- get_integer_input(cat(msg[[13]]),lang)
     
     # Handle the user's choice and determine whether to continue or exit
     if (!handle_change_option(user_input, lang, msg)) {
@@ -266,7 +300,6 @@ handle_addings <- function(msg,lang, text){
   
   # find corresponding file and update
   file_title<-paste(paste0(Sys.getenv("R_ROOT"),"/",lang),paste0(text,lang,".csv"),sep="/")
-  print(file_title)
   if(file.exists(file_title)){
     
     # remove existed file
