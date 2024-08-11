@@ -6,7 +6,7 @@ options(warn=-1)
 
 # library list
 packages <- list("plyr", "dplyr", "stringr", "ggplot2", "wordcloud", "reshape2",
-                 "png", "tcltk", "ggmap", "RColorBrewer","grid")
+                 "png", "grid","leaflet","htmlwidgets")
 
 # Install packages if not already installed and load them
 for (pck in packages) {
@@ -455,9 +455,9 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
   }
   # organize data
   if (lang =="ES"){
-    cat("\nTextos analizados. Mostrando resultados.")
+    cat("\nTextos analizados. Mostrando resultados.\n")
   }else if(lang =="EN"){
-    cat("\nTexts analyzed. Showing results.")
+    cat("\nTexts analyzed. Showing results.\n")
   }
   
   return (organize_data(df_geo, df_p, df_n))
@@ -540,6 +540,81 @@ plot_term_results <-function(terms,str,lang,color){
 
 }
 
+# ------------------------
+#  clean_and_convert 
+#-------------------------
+clean_and_convert <- function(x) {
+  # Replace non-standard dashes and commas with periods
+  x <- gsub("[–]", "-", x)   # Replace en-dashes with hyphens
+  x <- gsub(",", ".", x)     # Replace commas with periods
+  x <- as.numeric(x)         # Convert to numeric
+  return(x)
+}
+
+
+# ------------------------
+#  geolocalizated_results 
+#-------------------------
+geolocalizated_results<-function(data,lang){
+  
+  #' TODO!!
+  #'
+  #'
+  #'
+  View(data)
+  
+  # Create corresponding result folder if it doesn't exist
+  results_folder <- file.path(Sys.getenv("R_ROOT"), "RESULTS")
+  if (!dir.exists(results_folder)) {
+    dir.create(results_folder, recursive = TRUE, showWarnings = FALSE)
+  }
+  
+  # Set PDF title based on language
+  if (lang == "EN") {
+    text <- "SENTIMENT ANALYSIS GEOLOCALIZED"
+  } else if (lang == "ES") {
+    text <- "ANALISIS DE SENTIMIENTO GEOLOCALIZADO"
+  } 
+  
+  # Apply the cleaning function to lat and lon values
+  data$lon <- clean_and_convert(data$lon)
+  data$lat <- clean_and_convert(data$lat)
+  
+  # Define color mapping based on categoria
+  color_map <- function(categoria) {
+    if (categoria == "n") {
+      return("red")
+    } else if (categoria == "p") {
+      return("green")
+    }
+  }
+  
+  # Apply color mapping
+  data$marker_color <- sapply(data$categoria, color_map)
+  
+  # Combine name and word for popup and label
+  data$popup_label <- paste(data$name, " (", data$word, ") ", sep = "")
+  
+  # Visualize using leaflet
+  map <-leaflet(data) %>%
+    addTiles(group = "OSM") %>%
+    addCircleMarkers(
+      lat = ~lat,
+      lng = ~lon,
+      color = ~marker_color, # Use the color column for marker colors
+      radius = 5,            # Adjust the size of the circle markers
+      popup = ~popup_label,         # Show custom values
+      label = ~popup_label         
+    )
+  
+  # Save the leaflet map as an HTML file
+  html_title <- file.path(results_folder, paste(text, ".html", sep = ""))
+  saveWidget(map, file = html_title, selfcontained = TRUE)
+  
+  # Show result
+  file.show(html_title)
+}
+
 
 
 # ----------------------
@@ -591,26 +666,35 @@ handle_main_actions<-function(option){
         lat_long_check(all, lang)
         
         # get default country file 
-        cty<-read.csv(paste(Sys.getenv("R_ROOT"),"countries.csv", sep="/"),sep=";",stringsAsFactors = F,dec=".")
-         
-        # Add default longitude and latitude data to data  
-        all[,"longitude"]<-sample(cty[,"longitude"],nrow(all),replace=T)
-        all[,"latitude"]<-sample(cty[,"latitude"],nrow(all),replace=T)
-        all[,"name"]<-sample(cty[,"name"],nrow(all),replace=T)
-        lat_long_check(all, lang)
+        cty<-read.csv(paste(Sys.getenv("R_ROOT"),"countries.csv", sep="/"),sep=",",stringsAsFactors = F,dec=".")
         
+        # Assign random latitude, longitude, and name from cty to all
+        set.seed(123) # Set seed for reproducibility
+        
+        # Find rows in `all` with missing latitude or longitude
+        missing_coords_indices <- which(is.na(all$latitude) | is.na(all$longitude))
+        
+        # Randomly select rows from `cty` to assign to these missing rows
+        random_cty_rows <- cty[sample(nrow(cty), length(missing_coords_indices), replace = TRUE), ]
+        
+        # Assign random latitude, longitude, and name from `cty` to the missing rows in `all`
+        all[missing_coords_indices, "latitude"] <- random_cty_rows$latitude
+        all[missing_coords_indices, "longitude"] <- random_cty_rows$longitude
+        all[missing_coords_indices, "name"] <- random_cty_rows$name
+        lat_long_check(all, lang)
+
         # redirect to sentiment files
         terms_path = paste(Sys.getenv("R_ROOT"),lang,sep="/")
         pos_term_file = paste0(paste0("Pos_",lang),".csv")
         neg_term_file = paste0(paste0("Neg_",lang),".csv")
-        
+
         # read corresponding files
         pos_terms = read.csv(paste(terms_path,pos_term_file,sep ="/"))
         neg_terms = read.csv(paste(terms_path,neg_term_file,sep ="/"))
-        
+
         # organize, sentiments score by possitive and negative sentimens
         scores <- score_sentiment(all, pos_terms, neg_terms,lang)
-       
+
         # handle scores results
         handle_scores(scores, lang)
       }
@@ -715,13 +799,13 @@ handle_scores <- function(scores, lang) {
     # Plot results based on flags
     if (pos == 1) plot_term_results(scores[[2]], strings$positive, lang, "darkgreen")
     if (neg == 1) plot_term_results(scores[[3]], strings$negative, lang, "darkred")
-    #if (geo == 1) geoResults(scores[[1]], lang)
+    if (geo == 1) geolocalizated_results(scores[[1]], lang)
     
   } else {
     # Handle the case where all data is present
     plot_term_results(scores[[2]], strings$positive, lang, "darkgreen")
     plot_term_results(scores[[3]], strings$negative, lang, "darkred")
-    #geoResults(scores[[1]], lang)
+    geolocalizated_results(scores[[1]], lang)
   }
 }
 
@@ -782,80 +866,4 @@ handle_scores <- function(scores, lang) {
 #     return(respuesta)
 # 
 # }
-
-
-
-
-
-
-
-# ------------------
-#  geoResults
-#------------------
-
-
-geoResults<-function(data,lang)
-{
-  
-  dirGraph <- paste(Sys.getenv("R_ROOT"),"/Graphs/",sep="")
-  if(!dir.exists(dirGraph))
-    dir.create(dirGraph,recursive=T)
-  setwd(dirGraph)
-  
-  if(lang =="EN") 
-  { 
-    text ="SENTIMENT ANALYSIS GEOLOCALIZED"
-    pdftitle <- paste(text,".pdf",sep="")
-  } 
-  if(lang =="ES")
-  { 
-    text ="ANALISIS DE SENTIMIENTO GEOLOCALIZADO"
-    pdftitle <- paste(text,".pdf",sep="")
-  } 
-   
-  while (TRUE)
-  {
-    if(file.exists(pdftitle))
-      pdftitle <- paste(" - ", pdftitle)
-    else
-      break
-  }
-  
-  ll.visited <- geocode(as.character(unlist(data["name"])))
-  data["lon"]<-ll.visited$lon
-  data["lat"]<-ll.visited$lat
-  
-  xValue<-data["lon"]
-  yValue<-data["lat"]
-  
-  
-  #Using GGPLOT, plot the Base World Map
-  mp <- NULL
-  mapWorld <- borders("world", colour="gray50", fill="gray50") # create a layer of borders
-  mp <- ggplot() +   mapWorld
-  
-  #Now Layer the cities on top
-  
-  
-  myColors <- brewer.pal(2,"Set1")
-  
-  names(myColors) <- levels(data[,"categoria"])
-  colScale <- scale_colour_manual(name = data[,"categoria"],values = myColors)
-  
-  
-  mp <- mp+ geom_point(aes(x=xValue, y=yValue,colour=data[,"categoria"]), size=3)+
-        theme(legend.title=element_blank())+
-        ggtitle(text) + theme(plot.title = element_text(size = 25, face = "bold"))
-      
-        
-  pdf(pdftitle ,width=14,height=12/2, onefile=TRUE, paper="a4r")
-  print(mp)
-  dev.off()
-  
-  file.show(pdftitle)
-  
-}
-
-
-
 
