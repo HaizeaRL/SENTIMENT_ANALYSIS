@@ -78,27 +78,31 @@ determine_language <-function(option){
 #-------------------
 msg_data_checker <- function(lang){
   
-  #' TODO
+  #' Function to verify the existence of language-specific folders for text analysis.
+  #' - If the selected language is English, the function checks for the presence of the MSG_EN folder.
+  #' - If the selected language is Spanish, the function checks for the MSG_ES folder.
+  #' If the corresponding folder is missing, the function provides instructions on how to create it.
   #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #' @param lang 
+  #' Correspond to selected language.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #' This function does not return a value but prompt actions in case of error.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #' msg_data_checker(lang = "ES" )  # redirect to Spanish message checking.
   #'
   
   ctext <- NULL
   file_path = paste0(Sys.getenv("R_ROOT"),paste("/MSG",lang,sep="_"))
   if(!dir.exists(file.path(file_path))){
     if(lang == "EN"){
-      text = "English"
-      ctext <- sprintf("Folder: `MSG_EN` missing, there are no %s messages to analyze.\nPlease perform a message search. You can use the script: `2.1- Message_searching.R` for this purpose.", text)
+      text = "English" 
+      ctext <- sprintf("Folder `MSG_EN` is missing, there are no %s messages to analyze.\nPlease perform a message search using the script: `2.1- Message_searching.R` or unzip the corresponding folder from `Folders_to_add_for_DEMO.rar` file into the project.", text)
     }else if(lang == "ES"){
       text = "Español"
-      ctext <- sprintf("Falta la carpeta: `MSG_ES`, no existen mensajes en idioma %s para analizar.\nPor favor realiza la búsqueda de mensajes. Puede valerse del script: `2.1- Message_searching.R` para ello.\n", text)
+      ctext <- sprintf("Falta la carpeta: `MSG_ES`, no existen mensajes en idioma %s para analizar, realice una búsqueda de mensajes utilizando el script: `2.1-Búsqueda_de_mensajes.R` o descomprima la carpeta correspondiente del archivo `Folders_to_add_for_DEMO.rar`en el proyecto.", text)
     } 
   } 
   if (!is.null(ctext)){
@@ -114,17 +118,20 @@ msg_data_checker <- function(lang){
 #--------------------------
 category_data_checker <- function(lang){
   
-  #' TODO
+  #' Function to verify the existence of language-specific categories for text analysis.
+  #' - If the selected language is English, the function checks for the presence of the EN folder.
+  #' - If the selected language is Spanish, the function checks for the ES folder.
+  #' If the corresponding folder is missing, the function provides instructions on how to create it.
   #' 
-  #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #' @param lang 
+  #' Correspond to selected language.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #' This function does not return a value but prompt actions in case of error.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #' category_data_checker(lang = "ES" )  # redirect to Spanish category checking.
   #'
   
   ctext <- NULL
@@ -150,15 +157,16 @@ category_data_checker <- function(lang){
 #---------------------
 get_exception_msgs<-function(lang, file_full_path ,e){
   
-  #' Function that recover all prompt messages in corresponding language
+  #' TODO!!! Function that creates exception messages to prompt if errors occur in message files reading.
   #' @param lang 
-  #'   "ES" for Spanish,
-  #'   "EN" for English .
-  #' @return list 
-  #' This function return a list with all prompt messages. These messages correspond to Spanish or English language.
+  #' Correspond to selected language.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
+  #' @return NULL 
+  #' This function does not return a value but prompt actions in case of error.
   #' @examples
   #' # Example usage:
-  #' get_all_prompt_msgs(lang ="ES")  # obtain a list of spanish messages to prompt
+  #' category_data_checker(lang = "ES" )  # redirect to Spanish category checking.
   #'
   
   aux <-list()

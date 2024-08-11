@@ -1,12 +1,8 @@
 # Load necessary functions, call: Sentiment_analysis_functions.R
 source(paste0(paste0(Sys.getenv("R_ROOT"),"/2-Message_analysis/"),"Sentiment_analysis_functions.R"))
 
-
-
-#' Questions are provided to help determine in which language you want to perform the sentiment analysis.
-#' Based on the selected language, checks whether the messages to analyze and sentiment categories exist in that language.
-#' Later, perform and plot sentiment analysis in the specified language.
-#' During the process, if errors occur, guidelines are provided to guide.
+#' Questionary is provided and actions are handled by selected option
+#' During the process, if errors occur, guidelines are provided.
 repeat {
   cat("Indicate in which language you want to perform the sentiment analysis:\n")
   cat("1: ES\n")
