@@ -99,10 +99,10 @@ msg_data_checker <- function(lang){
   if(!dir.exists(file.path(file_path))){
     if(lang == "EN"){
       text = "English" 
-      ctext <- sprintf("Folder `MSG_EN` is missing, there are no %s messages to analyze.\nPlease perform a message search using the script: `2.1- Message_searching.R` or unzip the corresponding folder from `Folders_to_add_for_DEMO.rar` file into the project.", text)
+      ctext <- sprintf("Folder `MSG_EN` is missing, there are no %s messages to analyze.\nPlease unzip the corresponding folder from `Folders_to_add_for_DEMO.rar` file into the project.", text)
     }else if(lang == "ES"){
       text = "Español"
-      ctext <- sprintf("Falta la carpeta: `MSG_ES`, no existen mensajes en idioma %s para analizar, realice una búsqueda de mensajes utilizando el script: `2.1-Búsqueda_de_mensajes.R` o descomprima la carpeta correspondiente del archivo `Folders_to_add_for_DEMO.rar`en el proyecto.", text)
+      ctext <- sprintf("Falta la carpeta: `MSG_ES`, no existen mensajes en idioma %s para analizar.\nPor favor, descomprima la carpeta correspondiente del archivo `Folders_to_add_for_DEMO.rar`en el proyecto.", text)
     } 
   } 
   if (!is.null(ctext)){
