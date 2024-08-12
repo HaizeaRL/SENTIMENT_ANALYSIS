@@ -16,8 +16,6 @@ for (pck in packages) {
   }
 }
 
-# twitteR
-
 
 # -----------------
 # get_integer_input
@@ -27,11 +25,18 @@ get_integer_input <- function(prompt_message, lang =NULL) {
   
   #' Function that validates whether the entered option is numeric.
   #' If an incorrect input is entered, a message prompts the user to input a correct value.
+  #' 
+  #' @param prompt_message 
+  #' Message entered by prompt
+  #' @param lang 
+  #' Correspond to selected language. By default in NULL.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
   #' @return integer
   #' This function returns the correctly entered number.
   #' @examples
   #' # Example usage:
-  #' get_integer_input(option =1)  # Prompts the user to enter a number, returning correct option
+  #' get_integer_input(prompt_message =1)  # Prompts the user to enter a number, returning correct option
   #' 
   
   while (TRUE) {
@@ -79,9 +84,9 @@ determine_language <-function(option){
 msg_data_checker <- function(lang){
   
   #' Function to verify the existence of language-specific folders for text analysis.
-  #' - If the selected language is English, the function checks for the presence of the MSG_EN folder.
-  #' - If the selected language is Spanish, the function checks for the MSG_ES folder.
-  #' If the corresponding folder is missing, the function provides instructions on how to create it.
+  #' - If the selected language is English, the function checks for the presence of the `MSG_EN` folder.
+  #' - If the selected language is Spanish, the function checks for the `MSG_ES` folder.
+  #' If the corresponding folder is missing, provides instructions on how to create it.
   #' 
   #' @param lang 
   #' Correspond to selected language.
@@ -119,9 +124,9 @@ msg_data_checker <- function(lang){
 category_data_checker <- function(lang){
   
   #' Function to verify the existence of language-specific categories for text analysis.
-  #' - If the selected language is English, the function checks for the presence of the EN folder.
-  #' - If the selected language is Spanish, the function checks for the ES folder.
-  #' If the corresponding folder is missing, the function provides instructions on how to create it.
+  #' - If the selected language is English, the function checks for the presence of the `EN` folder.
+  #' - If the selected language is Spanish, the function checks for the `ES` folder.
+  #' If the corresponding folder is missing, provides instructions on how to create it.
   #' 
   #' @param lang 
   #' Correspond to selected language.
@@ -155,18 +160,19 @@ category_data_checker <- function(lang){
 # --------------------
 # get_exception_msgs
 #---------------------
-get_exception_msgs<-function(lang, file_full_path ,e){
+get_exception_msgs<-function(lang, file_full_path ,e = NULL){
   
-  #' TODO!!! Function that creates exception messages to prompt if errors occur in message files reading.
+  #' Function that creates exception messages to prompt if errors occur in message files reading.
   #' @param lang 
   #' Correspond to selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
+  #' @param file_full_path 
+  #' Correspond to the full path of the file to open.
+  #' @param e 
+  #' Correspond to exception error if it is presented
   #' @return NULL 
-  #' This function does not return a value but prompt actions in case of error.
-  #' @examples
-  #' # Example usage:
-  #' category_data_checker(lang = "ES" )  # redirect to Spanish category checking.
+  #' This function does not return a value but creates messages to prompt in each case.
   #'
   
   aux <-list()
@@ -187,12 +193,20 @@ get_exception_msgs<-function(lang, file_full_path ,e){
   return(aux)
 }
 
-# Function to print colored text
+
+# --------------------
+# cat_colored
+#--------------------- 
 cat_colored <- function(text, color) {
   
-  #' TODO
-  #' 
-  #' 
+  #' Function to print text colored. Call from `join_all_files` function
+  #' @param text 
+  #' text to prompt
+  #' @param color 
+  #' color to set to the text
+  #' @return NULL 
+  #' This function does not return a value but prompt passed text in corresponding color.
+  #'
   
   colors <- list(
     red = "\033[31m",
@@ -208,17 +222,21 @@ cat_colored <- function(text, color) {
 #------------------
 join_all_files <- function(file_path,lang){
   
-  #' TODO
-  #' 
-  #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
-  #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #' Function that join all messages files to analize in a single file.
+  #'
+  #' @param file_path 
+  #' Correspond to the path of the file to open.
+  #' @param lang 
+  #' Correspond to selected language.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
+  #' @return all 
+  #' This function return the final file with all texts. 
+  #' If exception is presented a message is prompt and tries with other encoding.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #' join_all_files(file_path ="C:/file_path",
+  #'                lang ="ES")  # read and join all Spanish texts
   #'
   
   all<-NULL
@@ -265,20 +283,18 @@ join_all_files <- function(file_path,lang){
 
 lat_long_check <- function(all,lang){
   
-  #' TODO
+  #' Function that checks how many messages have geolocalization lat & lon data.
   #' 
-  #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #' @param all 
+  #' All message in a single file to analyze.
+  #' @param lang 
+  #' Correspond to selected language.
+  #' - "ES" to print instruction messages in Spanish.
+  #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
-  #' @examples
-  #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #' This function does not return a value but prompt the results
   #'
-  #'
-  # determine msg num. with lat, log data
+  
   sum_lat_lon<-sum(is.na(all[,2]))
   text <- NULL
   if(lang == "EN" & (nrow(all)-sum_lat_lon) < nrow(all)){
@@ -300,44 +316,98 @@ lat_long_check <- function(all,lang){
 
 }
 
-# ------------------
-#  update_matches 
+# ------------------------
+#  clean_and_convert 
+#-------------------------
+clean_and_convert <- function(x) {
+  
+  #' TODO!!
+  #' 
+  #' Determine corresponding language characters from selected option
+  #' 
+  
+  # Replace non-standard dashes and commas with periods
+  x <- gsub("[–]", "-", x)   # Replace en-dashes with hyphens
+  x <- gsub(",", ".", x)     # Replace commas with periods
+  x <- as.numeric(x)         # Convert to numeric
+  return(x)
+}
+
+#------------------
+#  update_matches
 #------------------
 update_matches <- function(lang, matches, words, df, df_geo, aux, i, categoria) {
   
   #' TODO
   #' 
+  #' 
+  #' @param option 
+  #'   1 directs to Spanish sentiment files creation
+  #'   2 directs to English sentiment files creation
+  #' @return NULL 
+  #' This function does not return a value but redirect to corresponding language actions.
+  #' @examples
+  #' # Example usage:
+  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #'
+  #'
   
   # Check if there are any non-NA matches
   if (sum(!is.na(matches)) > 0) {
     
     # Extract the term(s) corresponding to the non-NA matches
-    term <- words[!is.na(matches)]
-    
-    # Extract the term(s) corresponding to the non-NA matches
     terms <- words[!is.na(matches)]
     
     for (term in terms) {
+      match_count <- sum(!is.na(matches))  # Count the non-NA matches
+      
       if (term %in% df[, 1]) {
         # Term exists in the data frame, update its count
         pos <- grep(term, df[, 1])
-        df[pos, 2] <- df[pos, 2] + sum(!is.na(matches))
+        df[pos, 2] <- df[pos, 2] + match_count
         
-        # Update the geographic data frame if coordinates match
-        if ((df_geo[, "lon"] == aux[i, "longitude"]) && (df_geo[, "lat"] == aux[i, "latitude"])) {
-          pos_geo <- grep(term, df_geo[, 1])
-          if (length(pos_geo) > 0) {
-            df_geo[pos_geo, 2] <- df_geo[pos_geo, 2] + sum(!is.na(matches))
-          }
+        # Update the geographic data frame
+        pos_geo <- grep(term, df_geo[, 1])
+        
+        if (length(pos_geo) > 0) {
+          # If the term exists in df_geo, update its values
+          df_geo[pos_geo, 2] <- df_geo[pos_geo, 2] + match_count
+          
+          # Create new geo value
+          lat <- clean_and_convert(aux[i, "latitude"])
+          lon <- clean_and_convert(aux[i, "longitude"])
+          new_value <- c(aux[i, "name"], lat, lon)
+          
+          # Append the new value to the existing list in the name_lat_lon column
+          prev_value <- df_geo$name_lat_lon[[pos_geo]]
+          updated_value <- c(prev_value, list(new_value))
+          df_geo$name_lat_lon[[pos_geo]] <- updated_value
+          
+        } else {
+          # If the term is somehow not found, we add it to df_geo
+          lat <- clean_and_convert(aux[i, "latitude"])
+          lon <- clean_and_convert(aux[i, "longitude"])
+          new_value <- c(aux[i, "name"], lat, lon)
+          
+          # Add the new term to df_geo with the corresponding geographic information
+          df_geo <- rbind(df_geo, data.frame(word = term, cuantos = match_count,
+                                             name_lat_lon = I(list(list(new_value))),
+                                             categoria = categoria))
         }
+        
       } else {
         # Term does not exist in the data frame, add it
-        df <- rbind(df, data.frame(word = term, cuantos = sum(!is.na(matches))))
+        df <- rbind(df, data.frame(word = term, cuantos = match_count))
         
-        # Add to geographic data frame
-        df_geo <- rbind(df_geo, data.frame(word = term, cuantos = sum(!is.na(matches)), 
-                                           lon = aux[i, "longitude"], lat = aux[i, "latitude"], 
-                                           name = aux[i, "name"], categoria = categoria))
+        # Create new geo value and add to geographic data frame
+        lat <- clean_and_convert(aux[i, "latitude"])
+        lon <- clean_and_convert(aux[i, "longitude"])
+        new_value <- c(aux[i, "name"], lat, lon)
+        
+        # Add the new term to df_geo with the corresponding geographic information
+        df_geo <- rbind(df_geo, data.frame(word = term, cuantos = match_count,
+                                           name_lat_lon = I(list(list(new_value))),
+                                           categoria = categoria))
       }
     }
   }
@@ -353,6 +423,7 @@ update_matches <- function(lang, matches, words, df, df_geo, aux, i, categoria) 
 organize_data <- function(df_geo, df_p, df_n) {
   
   #' TODO
+  #' 
   #' 
   
   # Initialize the list and the vector for missing data indicators
@@ -414,7 +485,8 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
   
   df_p<-NULL
   df_n<-NULL
-  df_geo <-NULL
+  df_geo_p <-NULL
+  df_geo_n <-NULL
   aux<-sentences
   sentences<-sentences$text
   
@@ -451,14 +523,14 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
     neg_matches<-match(words, tolower(unlist(neg_words)))
     
     # check for possitive matches
-    result_pos  =  update_matches(lang, pos_matches, words, df_p, df_geo, aux, i, "p") 
+    result_pos  =  update_matches(lang, pos_matches, words, df_p, df_geo_p, aux, i, "p") 
     df_p = result_pos$df
-    df_geo = result_pos$df_geo
+    df_geo_p = result_pos$df_geo
     
     # check for negative matches
-    result_neg  =  update_matches(lang, neg_matches, words, df_n, df_geo, aux, i, "n") 
+    result_neg  =  update_matches(lang, neg_matches, words, df_n, df_geo_n, aux, i, "n") 
     df_n = result_neg$df
-    df_geo = result_neg$df_geo
+    df_geo_n <- result_neg$df_geo
     
   }
   # organize data
@@ -467,6 +539,9 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
   }else if(lang =="EN"){
     cat("\nTexts analyzed. Showing results.\n")
   }
+  
+  # join both geo data in a single df
+  df_geo = rbind(df_geo_p,df_geo_n)
   
   return (organize_data(df_geo, df_p, df_n))
 }
@@ -548,71 +623,69 @@ plot_term_results <-function(terms,str,lang,color){
 
 }
 
-# ------------------------
-#  clean_and_convert 
-#-------------------------
-clean_and_convert <- function(x) {
-  # Replace non-standard dashes and commas with periods
-  x <- gsub("[–]", "-", x)   # Replace en-dashes with hyphens
-  x <- gsub(",", ".", x)     # Replace commas with periods
-  x <- as.numeric(x)         # Convert to numeric
-  return(x)
-}
 
 
 # ------------------------
 #  geolocalizated_results 
 #-------------------------
-geolocalizated_results<-function(data,lang){
+geolocalizated_results <- function(data, lang) {
+  
   
   #' TODO!!
-  #'
-  #'
-  #'
-  View(data)
+  #' 
+  #' Determine corresponding language characters from selected option
   
-  # Create corresponding result folder if it doesn't exist
+  # Create the results folder if it doesn't exist
   results_folder <- file.path(Sys.getenv("R_ROOT"), "RESULTS")
   if (!dir.exists(results_folder)) {
     dir.create(results_folder, recursive = TRUE, showWarnings = FALSE)
   }
   
-  # Set PDF title based on language
+  # Set title based on language
   if (lang == "EN") {
     text <- "SENTIMENT ANALYSIS GEOLOCALIZED"
   } else if (lang == "ES") {
-    text <- "ANALISIS DE SENTIMIENTO GEOLOCALIZADO"
-  } 
-  
-  # Apply the cleaning function to lat and lon values
-  data$lon <- clean_and_convert(data$lon)
-  data$lat <- clean_and_convert(data$lat)
-  
-  # Define color mapping based on categoria
-  color_map <- function(categoria) {
-    if (categoria == "n") {
-      return("red")
-    } else if (categoria == "p") {
-      return("green")
-    }
+    text <- "ANÁLISIS DE SENTIMIENTO GEOLOCALIZADO"
   }
   
+  # Expand data to account for multiple geolocations per word
+  expanded_data <- data %>%
+    rowwise() %>%
+    do({
+      # Extract the list of geolocations for each word
+      locations <- .$name_lat_lon
+      
+      # Create a data frame with one row per location
+      if (is.list(locations) && all(sapply(locations,length) == 3)){
+        data.frame(
+          word = .$word,
+          cuantos = 1,  # Each row represents one occurrence
+          categoria = .$categoria,
+          name = sapply(locations,`[[`, 1),
+          lat = as.numeric(sapply(locations,`[[`, 2)),
+          lon = as.numeric(sapply(locations,`[[`, 3)),
+          stringsAsFactors = FALSE
+        )
+      }
+    }) %>%
+    ungroup()
+  
   # Apply color mapping
-  data$marker_color <- sapply(data$categoria, color_map)
+  expanded_data$marker_color <- ifelse(expanded_data$categoria=="p", "Green", "Red")
   
   # Combine name and word for popup and label
-  data$popup_label <- paste(data$name, " (", data$word, ") ", sep = "")
+  expanded_data$popup_label <- paste(expanded_data$name, " (", expanded_data$word, ") ", sep = "")
   
   # Visualize using leaflet
-  map <-leaflet(data) %>%
+  map <- leaflet(expanded_data) %>%
     addTiles(group = "OSM") %>%
     addCircleMarkers(
       lat = ~lat,
       lng = ~lon,
-      color = ~marker_color, # Use the color column for marker colors
-      radius = 5,            # Adjust the size of the circle markers
-      popup = ~popup_label,         # Show custom values
-      label = ~popup_label         
+      radius = 3,    # Adjust the size of the circle markers
+      color = ~marker_color, # Adjust the color
+      popup = ~popup_label,   # Show custom values
+      label = ~popup_label   
     )
   
   # Save the leaflet map as an HTML file
