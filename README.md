@@ -92,6 +92,68 @@ git clone https://github.com/HaizeaRL/SENTIMENT_ANALYSIS
 cd market-opinion-analysis
 ```
 
-### Steps to create emotions files
+### Sentiment files creation
+
+This prototype is designed to identify the best market niche for product commercialization. To achieve this, it is crucial to define both positive and negative categories that characterize the product. These categories will help in detecting user opinions and sentiments towards the product by identifying which positive and negative categories are mentioned when discussing it.
+
+These categories are created using the script: `1-Emotions_files_creation.R`. To run this script:
+
+1.  Open the script in R, select all the code, and click the “Run” button.
+2.  Alternatively, enter the following command in the R console:
+
+``` r
+source("1-Emotions_files_creation.R")
+```
+
+Running this script, the user will see a series of questions that need to be answered:
+
+![Emotions-files-flow](./img/emotions_files_flow.png)
+
+As shown in the image above, the user will be prompted with questions to determine the language for sentiment analysis. Two languages are available: Spanish and English.
+
+Once the language is selected, the program generates default CSV files (e.g., Neg_ES.csv and Pos_ES.csv). These files contain adjectives or categories that describe a product both positively and negatively. The user can view these files on the screen and has the option to add additional categories if needed.
+
+When saving changes, the program checks for and removes any duplicates.
+
+Finally, the files are saved in folders automatically created by the system, named `ES` and `EN` according to each language (in our example).
+
+![English_emotions_files](./img/english_emotion_files.png)
 
 ### Steps for sentiment analysis
+
+For effective sentiment analysis, it's essential to have a large dataset. Additionally, it is recommended that the words being analyzed are synonyms. The following illustration serves as an example:
+
+![Term_synonyms_files](./img/term_synonims_files.png)
+
+**NOTE:** Regarding the messages to be analyzed, please remember that the original 2016 version accessed Twitter (now X) to retrieve messages and perform sentiment analysis. Due to changes in platform access policies, this functionality is no longer available for free. As a result, the message search feature has been omitted in the updated version.
+
+However, historical texts collected at that time are preserved and included in the `Folders_to_add_for_DEMO.rar` archive. These texts can be used to verify and validate the sentiment analysis performed by the prototype.
+
+To perform sentiment analysis, follow these instructions:
+
+1.  Open the script `2-Sentiment_analysis.R` in R, select all the code, and click the “Run” button.
+2.  Alternatively, enter the following command in the R console:
+
+``` r
+source("2-Sentiment_analysis.R")
+```
+
+Once you execute the script and follow the presented instructions, the code will ensure that both sentiment category files are created and the messages to analyze are extracted.
+
+![Sentiment_analisis_flow](./img/sentiment_analysis_1.png)
+
+![Sentiment_analisis_flow1](./img/sentiment_analysis_2.png)
+
+Later sentiment analysis is performed:
+
+![Sentiment_analisis_flow2](./img/sentiment_analysis_3.png)
+
+As a result, the following elements are obtained. All of them saved in the `RESULTS` folder:
+
+![Results_folder](./img/results_folder.png)
+
+-   Word clouds of the most frequently used terms: `WORDCLOUD_NEGATIVES.png` and `WORDCLOUD_POSITIVES.png`
+-   Representation and comparison of the most used terms: `NEGATIVES_TERM_INSTANCES.png` and `POSITIVES_TERM_INSTANCES.png`
+-   A world map identifying positive and negative terms by color based on geolocation: `SENTIMENT_ANALYSIS_GEOLOCALIZED.html`
+
+![INSTANCIAS_TERMINOS_POSITIVOS](./img/result1.png) ![MAP](./img/result2.png)
