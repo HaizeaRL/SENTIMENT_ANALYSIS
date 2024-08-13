@@ -156,5 +156,4 @@ As a result, the following elements are obtained. All of them saved in the `RESU
 -   Representation and comparison of the most used terms: `NEGATIVES_TERM_INSTANCES.png` and `POSITIVES_TERM_INSTANCES.png`
 -   A world map identifying positive and negative terms by color based on geolocation: `SENTIMENT_ANALYSIS_GEOLOCALIZED.html`
 
-![INSTANCIAS_TERMINOS_POSITIVOS](./img/result1.png) 
-![MAP](./img/result2.png)
+![INSTANCIAS_TERMINOS_POSITIVOS](./img/result1.png) ![MAP](./img/result2.png)
