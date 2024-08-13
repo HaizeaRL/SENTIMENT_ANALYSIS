@@ -1,8 +1,7 @@
 # Load necessary functions, call: Sentiment_analysis_functions.R
 source(paste0(paste0(Sys.getenv("R_ROOT"),"/2-Message_analysis/"),"Sentiment_analysis_functions.R"))
 
-#' Questionary is provided and actions are handled by selected option
-#' During the process, if errors occur, guidelines are provided.
+
 repeat {
   cat("Indicate in which language you want to perform the sentiment analysis:\n")
   cat("1: ES\n")
@@ -12,7 +11,8 @@ repeat {
   # Read user input
   user_input <- get_integer_input("Enter your choice: ")
 
-  # Handle the user's choice and determine whether to continue or exit
+  # Questionary is provided and actions are handled by the selected option
+  # During the process, if errors occur, guidelines are provided.
   if (!handle_language_options(user_input)) {
 
     # remove all used variables

@@ -27,17 +27,16 @@ get_integer_input <- function(prompt_message, lang =NULL) {
   #' If an incorrect input is entered, a message prompts the user to input a correct value.
   #' 
   #' @param prompt_message 
-  #' Message entered by prompt
+  #' The message entered by the prompt.
   #' @param lang 
-  #' Correspond to selected language. By default in NULL.
+  #' Corresponds to the selected language. By default, it is NULL.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @return integer
   #' This function returns the correctly entered number.
   #' @examples
   #' # Example usage:
-  #' get_integer_input(prompt_message =1)  # Prompts the user to enter a number, returning correct option
-  #' 
+  #' get_integer_input(prompt_message = 1)  # Prompts the user to enter a number, returning the correct option.
   
   while (TRUE) {
     user_input <- readline(prompt = prompt_message)
@@ -63,16 +62,17 @@ get_integer_input <- function(prompt_message, lang =NULL) {
 
 determine_language <-function(option){
   
-  #' Function that determine corresponding language characters. 
-  #' "ES" or "EN" depending of selected option.
+  #' Function that determines the corresponding language characters.
+  #' Returns "ES" or "EN" depending on the selected option.
+  #' 
   #' @param option 
   #'   1 for Spanish,
-  #'   2 for English .
-  #' @return NULL 
-  #' This function returns "ES" or "EN" according to selected language.
+  #'   2 for English.
+  #' @return character
+  #' This function returns "ES" or "EN" according to the selected language.
   #' @examples
   #' # Example usage:
-  #' determine_language(option =1)  # returns "ES"
+  #' determine_language(option = 1)  # returns "ES"
   
   return(ifelse(option==1,"ES","EN"))
 }
@@ -86,18 +86,17 @@ msg_data_checker <- function(lang){
   #' Function to verify the existence of language-specific folders for text analysis.
   #' - If the selected language is English, the function checks for the presence of the `MSG_EN` folder.
   #' - If the selected language is Spanish, the function checks for the `MSG_ES` folder.
-  #' If the corresponding folder is missing, provides instructions on how to create it.
+  #' If the corresponding folder is missing, the function provides instructions on how to create it.
   #' 
   #' @param lang 
-  #' Correspond to selected language.
+  #' Corresponds to the selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but prompt actions in case of error.
+  #' This function does not return a value but prompts actions in case of an error.
   #' @examples
   #' # Example usage:
-  #' msg_data_checker(lang = "ES" )  # redirect to Spanish message checking.
-  #'
+  #' msg_data_checker(lang = "ES")  # redirects to Spanish message checking.
   
   ctext <- NULL
   file_path = paste0(Sys.getenv("R_ROOT"),paste("/MSG",lang,sep="_"))
@@ -126,18 +125,17 @@ category_data_checker <- function(lang){
   #' Function to verify the existence of language-specific categories for text analysis.
   #' - If the selected language is English, the function checks for the presence of the `EN` folder.
   #' - If the selected language is Spanish, the function checks for the `ES` folder.
-  #' If the corresponding folder is missing, provides instructions on how to create it.
+  #' If the corresponding folder is missing, the function provides instructions on how to create it.
   #' 
   #' @param lang 
-  #' Correspond to selected language.
+  #' Corresponds to the selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but prompt actions in case of error.
+  #' This function does not return a value but prompts actions in case of an error.
   #' @examples
   #' # Example usage:
-  #' category_data_checker(lang = "ES" )  # redirect to Spanish category checking.
-  #'
+  #' category_data_checker(lang = "ES")  # redirects to Spanish category checking.
   
   ctext <- NULL
   file_path = paste(Sys.getenv("R_ROOT"),lang,sep="/")
@@ -162,18 +160,18 @@ category_data_checker <- function(lang){
 #---------------------
 get_exception_msgs<-function(lang, file_full_path ,e = NULL){
   
-  #' Function that creates exception messages to prompt if errors occur in message files reading.
+  #' Function that creates exception messages to prompt if errors occur during the reading of message files.
+  #' 
   #' @param lang 
-  #' Correspond to selected language.
+  #' Corresponds to the selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @param file_full_path 
-  #' Correspond to the full path of the file to open.
+  #' The full path of the file to be opened.
   #' @param e 
-  #' Correspond to exception error if it is presented
+  #' The exception error, if it occurs.
   #' @return NULL 
   #' This function does not return a value but creates messages to prompt in each case.
-  #'
   
   aux <-list()
   if(lang=="ES"){
@@ -199,14 +197,17 @@ get_exception_msgs<-function(lang, file_full_path ,e = NULL){
 #--------------------- 
 cat_colored <- function(text, color) {
   
-  #' Function to print text colored. Call from `join_all_files` function
+  #' Function to print colored text. Called from the `join_all_files` function.
+  #' 
   #' @param text 
-  #' text to prompt
+  #' The text to print.
   #' @param color 
-  #' color to set to the text
+  #' The color to apply to the text.
   #' @return NULL 
-  #' This function does not return a value but prompt passed text in corresponding color.
-  #'
+  #' This function does not return a value but prints the passed text in the specified color.
+  #' @examples
+  #' # Example usage:
+  #' cat_colored("Hello, World!", "red")  # Prints "Hello, World!" in red color.
   
   colors <- list(
     red = "\033[31m",
@@ -222,22 +223,21 @@ cat_colored <- function(text, color) {
 #------------------
 join_all_files <- function(file_path,lang){
   
-  #' Function that join all messages files to analize in a single file.
-  #'
+  #' Function that joins all message files to analyze into a single file.
+  #' 
   #' @param file_path 
-  #' Correspond to the path of the file to open.
+  #' The path of the file to open.
   #' @param lang 
-  #' Correspond to selected language.
+  #' The selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @return all 
-  #' This function return the final file with all texts. 
-  #' If exception is presented a message is prompt and tries with other encoding.
+  #' This function returns the final file containing all texts. 
+  #' If an exception occurs, a message is printed and the function tries with another encoding.
   #' @examples
   #' # Example usage:
-  #' join_all_files(file_path ="C:/file_path",
-  #'                lang ="ES")  # read and join all Spanish texts
-  #'
+  #' join_all_files(file_path = "C:/file_path",
+  #'                lang = "ES")  # Reads and joins all Spanish texts
   
   all<-NULL
   if(dir.exists(file_path)){
@@ -283,17 +283,20 @@ join_all_files <- function(file_path,lang){
 
 lat_long_check <- function(all,lang){
   
-  #' Function that checks how many messages have geolocalization lat & lon data.
+  #' Function that checks how many messages have geolocation latitude and longitude data.
   #' 
   #' @param all 
-  #' All message in a single file to analyze.
+  #' All messages in a single file to analyze.
   #' @param lang 
-  #' Correspond to selected language.
+  #' The selected language.
   #' - "ES" to print instruction messages in Spanish.
   #' - "EN" to print instruction messages in English.
   #' @return NULL 
-  #' This function does not return a value but prompt the results
-  #'
+  #' This function does not return a value but prints the results.
+  #' @examples
+  #' # Example usage:
+  #' lat_long_check(all = messages_data,
+  #'                lang = "EN")  # Checks and prints the number of messages with geolocation data in English.
   
   sum_lat_lon<-sum(is.na(all[,2]))
   text <- NULL
@@ -321,10 +324,20 @@ lat_long_check <- function(all,lang){
 #-------------------------
 clean_and_convert <- function(x) {
   
-  #' TODO!!
+  #' Cleans and converts text to numeric values.
   #' 
-  #' Determine corresponding language characters from selected option
+  #' This function performs the following operations:
+  #' - Replaces non-standard dashes and commas with periods.
+  #' - Converts the cleaned text to numeric values.
   #' 
+  #' @param x 
+  #' A character vector or string to be cleaned and converted.
+  #' @return numeric 
+  #' The cleaned and converted numeric value.
+  #' @examples
+  #' # Example usage:
+  #' clean_and_convert("1,234.56")  # Returns 1234.56 as a numeric value.
+  #' clean_and_convert("1–234.56")  # Returns 1234.56 as a numeric value after replacing the en-dash with a hyphen.
   
   # Replace non-standard dashes and commas with periods
   x <- gsub("[–]", "-", x)   # Replace en-dashes with hyphens
@@ -338,18 +351,36 @@ clean_and_convert <- function(x) {
 #------------------
 update_matches <- function(lang, matches, words, df, df_geo, aux, i, categoria) {
   
-  #' TODO
+  #' Updates the counts and geographic data for terms based on matches found.
   #' 
+  #' This function performs the following actions:
+  #' - Updates the count of terms in the data frame `df` based on non-NA matches.
+  #' - Updates the geographic data frame `df_geo` with latitude and longitude information.
+  #' - Adds new terms to both data frames if they are not already present.
   #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #' @param lang 
+  #' The selected language. This parameter is not used in the function implementation but may be intended for future use.
+  #' @param matches 
+  #' A vector of matches indicating the positions of found terms.
+  #' @param words 
+  #' A vector of terms corresponding to the matches.
+  #' @param df 
+  #' A data frame containing term counts.
+  #' @param df_geo 
+  #' A data frame containing geographic information associated with terms.
+  #' @param aux 
+  #' A data frame containing additional information, including latitude and longitude.
+  #' @param i 
+  #' The index for the current row in the `aux` data frame.
+  #' @param categoria 
+  #' The category associated with the terms being updated.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #' This function does not return a value but updates the data frames `df` and `df_geo`.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
-  #'
+  #' update_matches(lang = "EN", matches = c(1, NA, 2), words = c("term1", "term2"), 
+  #'                df = existing_df, df_geo = existing_df_geo, aux = aux_data, 
+  #'                i = 1, categoria = "Category1")  # Updates term counts and geographic data for English terms
   #'
   
   # Check if there are any non-NA matches
@@ -422,9 +453,33 @@ update_matches <- function(lang, matches, words, df, df_geo, aux, i, categoria) 
 
 organize_data <- function(df_geo, df_p, df_n) {
   
-  #' TODO
+  #' Organizes data frames into a list and identifies which ones are missing.
   #' 
+  #' This function:
+  #' - Checks if each provided data frame (`df_geo`, `df_p`, `df_n`) is non-empty.
+  #' - Adds non-empty data frames to a list.
+  #' - Records which data frames are missing.
+  #' - Returns a list containing the non-empty data frames and an indicator of missing data frames.
   #' 
+  #' @param df_geo 
+  #' A data frame containing geographic data.
+  #' @param df_p 
+  #' A data frame containing positive sentiment data.
+  #' @param df_n 
+  #' A data frame containing negative sentiment data.
+  #' @return list 
+  #' A list where:
+  #' - The first element is `df_geo` if it is not empty.
+  #' - The second element is `df_p` if it is not empty.
+  #' - The third element is `df_n` if it is not empty.
+  #' - The fourth element is a vector indicating which of the first three data frames are missing.
+  #' @examples
+  #' # Example usage:
+  #' df_geo <- data.frame(word = c("term1", "term2"), cuantos = c(5, 10))
+  #' df_p <- data.frame(word = c("term1"), cuantos = c(3))
+  #' df_n <- data.frame()  # Empty data frame
+  #' result <- organize_data(df_geo = df_geo, df_p = df_p, df_n = df_n)
+  #' # result will be a list with df_geo, df_p, and an indicator that df_n is missing.
   
   # Initialize the list and the vector for missing data indicators
   l <- list()
@@ -463,25 +518,39 @@ organize_data <- function(df_geo, df_p, df_n) {
 #  score_sentiment 
 # ------------------
 
-#evaluation tweets function
 score_sentiment <- function(sentences, pos_words, neg_words, lang){
   
-  #' TODO
+  #' Performs sentiment analysis on a set of sentences and organizes the results.
   #' 
-  #' Determine corresponding language characters from selected option
-  #' Check if needed data is presented. Ask for its creation if not.
-  #' Realize sentiment analisis a display results in corresponding language.
+  #' This function:
+  #' - Cleans and processes each sentence.
+  #' - Checks sentiment against positive and negative word lists.
+  #' - Updates sentiment counts and geographic data.
+  #' - Displays results in the specified language.
   #' 
-  #' @param option 
-  #'   1 directs to Spanish sentiment analysis actions
-  #'   2 directs to English sentiment analysis actions
-  #'   0 close program
-  #' @return NULL 
-  #' This function does not return a value but redirect to corresponding actions.
+  #' @param sentences 
+  #' A data frame containing sentences to be analyzed, with a column named `text`.
+  #' @param pos_words 
+  #' A vector of positive sentiment words.
+  #' @param neg_words 
+  #' A vector of negative sentiment words.
+  #' @param lang 
+  #' The selected language for output.
+  #' - "ES" for Spanish output.
+  #' - "EN" for English output.
+  #' @return list 
+  #' A list containing:
+  #' - `df_geo`: The combined geographic data frame.
+  #' - `df_p`: The data frame with positive sentiment counts.
+  #' - `df_n`: The data frame with negative sentiment counts.
+  #' The list is organized by the `organize_data` function.
   #' @examples
   #' # Example usage:
-  #' handle_language_options(option =1)  # redirect to Spanish sentiment analysis
-  #'
+  #' sentences <- data.frame(text = c("I love this product", "I hate waiting"))
+  #' pos_words <- c("love", "enjoy", "happy")
+  #' neg_words <- c("hate", "angry", "bad")
+  #' result <- score_sentiment(sentences = sentences, pos_words = pos_words, neg_words = neg_words, lang = "EN")
+  #' # result will be a list containing the analyzed geographic data and sentiment counts.
   
   df_p<-NULL
   df_n<-NULL
@@ -551,10 +620,32 @@ score_sentiment <- function(sentences, pos_words, neg_words, lang){
 #-------------------------
 plot_term_results <-function(terms,str,lang,color){
   
-  #' TODO!!
+  #' Generates and saves a word cloud and a term count plot, then creates a PDF with the results.
   #' 
-  #' Determine corresponding language characters from selected option
-  
+  #' This function:
+  #' - Creates a results folder if it doesn't exist.
+  #' - Sets titles and labels based on the selected language.
+  #' - Generates a word cloud and saves it as a PNG file.
+  #' - Creates a ggplot2 scatter plot of term counts.
+  #' - Combines both plots into a PDF file.
+  #' 
+  #' @param terms 
+  #' A data frame with terms and their corresponding counts. Should have columns `word` and `cuantos`.
+  #' @param str 
+  #' A string used to name the output files and titles.
+  #' @param lang 
+  #' The selected language for the output.
+  #' - "EN" for English.
+  #' - "ES" for Spanish.
+  #' @param color 
+  #' A vector of colors to use in the word cloud.
+  #' @return NULL 
+  #' This function does not return a value but creates a PDF file with the results and displays it.
+  #' @examples
+  #' # Example usage:
+  #' terms <- data.frame(word = c("positive", "negative", "neutral"), cuantos = c(10, 5, 2))
+  #' plot_term_results(terms = terms, str = "SentimentAnalysis", lang = "EN", color = c("blue", "red", "grey"))
+  #' # This will generate a PDF with a word cloud and a scatter plot of term counts.
   
   # Create corresponding result folder if it doesn't exist
   results_folder <- file.path(Sys.getenv("R_ROOT"), "RESULTS")
@@ -631,9 +722,38 @@ plot_term_results <-function(terms,str,lang,color){
 geolocalizated_results <- function(data, lang) {
   
   
-  #' TODO!!
+  #' Generates a geolocalized sentiment analysis map and saves it as an HTML file.
   #' 
-  #' Determine corresponding language characters from selected option
+  #' This function:
+  #' - Creates a results folder if it doesn't exist.
+  #' - Sets the title based on the selected language.
+  #' - Expands the input data to handle multiple geolocations per word.
+  #' - Visualizes the data using a leaflet map with color-coded markers.
+  #' - Saves the map as an HTML file and displays it.
+  #' 
+  #' @param data 
+  #' A data frame containing sentiment analysis results with geolocated information. Should have columns:
+  #' - `word`: The term associated with the sentiment.
+  #' - `name_lat_lon`: A list containing name, latitude, and longitude for each term.
+  #' - `categoria`: Sentiment category, e.g., "p" for positive, "n" for negative.
+  #' @param lang 
+  #' The selected language for the output.
+  #' - "EN" for English.
+  #' - "ES" for Spanish.
+  #' @return NULL 
+  #' This function does not return a value but creates an HTML file with a leaflet map and displays it.
+  #' @examples
+  #' # Example usage:
+  #' data <- data.frame(
+  #'   word = c("happy", "sad"),
+  #'   name_lat_lon = I(list(
+  #'     list("Location1", "40.7128", "-74.0060"),
+  #'     list("Location2", "34.0522", "-118.2437")
+  #'   )),
+  #'   categoria = c("p", "n")
+  #' )
+  #' geolocalizated_results(data = data, lang = "EN")
+  #' # This will generate and display a leaflet map with the geolocalized sentiment data.
   
   # Create the results folder if it doesn't exist
   results_folder <- file.path(Sys.getenv("R_ROOT"), "RESULTS")
@@ -705,19 +825,25 @@ geolocalizated_results <- function(data, lang) {
 
 handle_main_actions<-function(option){
   
-  #' Function that handles languages based actions
+  #' Handles the main actions based on the selected language option for sentiment analysis.
   #' 
-  #' Determine corresponding language characters from selected option
-  
+  #' This function:
+  #' - Determines the language based on the selected option.
+  #' - Checks for necessary message files and sentiment categories.
+  #' - Joins all message files into a single data frame.
+  #' - Verifies and updates geolocation data.
+  #' - Reads sentiment terms for positive and negative sentiment analysis.
+  #' - Scores the sentiment based on the combined data.
+  #' - Handles and processes the sentiment scores accordingly.
   #' 
   #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #'   1 directs to Spanish sentiment files creation.
+  #'   2 directs to English sentiment files creation.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #' This function does not return a value but performs various actions based on the selected language option.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment analysis actions
+  #' handle_main_actions(option = 1)  # Redirect to Spanish sentiment analysis actions
   #'
   
   #' Determine corresponding language characters:
@@ -788,23 +914,26 @@ handle_main_actions<-function(option){
 # ----------------------
 # handle_language_options
 #-----------------------
+
 handle_language_options<-function(option){
   
-  #' Function that handles languages based actions
+  #' Handles actions based on the selected language option for sentiment analysis.
   #' 
-  #' Determine corresponding language characters from selected option
-  #' Check if needed data is presented. Ask for its creation if not.
-  #' Realize sentiment analisis a display results in corresponding language.
+  #' This function:
+  #' - Determines the language based on the selected option.
+  #' - Directs to the appropriate main actions for sentiment analysis in the selected language.
+  #' - Closes the program if the option is 0.
+  #' - Prompts an error message for invalid options and continues the loop if needed.
   #' 
   #' @param option 
-  #'   1 directs to Spanish sentiment analysis actions
-  #'   2 directs to English sentiment analysis actions
-  #'   0 close program
+  #'   1 directs to Spanish sentiment analysis actions.
+  #'   2 directs to English sentiment analysis actions.
+  #'   0 closes the program.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding actions.
+  #' This function does not return a value but performs various actions based on the selected option.
   #' @examples
   #' # Example usage:
-  #' handle_language_options(option =1)  # redirect to Spanish sentiment analysis
+  #' handle_language_options(option = 1)  # Redirect to Spanish sentiment analysis
   #'
   
   if (option == 1) {
@@ -823,7 +952,6 @@ handle_language_options<-function(option){
     return(TRUE)  # continue the loop
   }
   
-  
   return(FALSE)  # exit the loop
 }
 
@@ -833,7 +961,29 @@ handle_language_options<-function(option){
 
 handle_scores <- function(scores, lang) {
   
-  #' TODO
+  #' Handles the results of sentiment analysis based on the provided scores.
+  #' 
+  #' This function:
+  #' - Defines language-specific strings for messages and labels.
+  #' - Checks for missing data and generates appropriate messages.
+  #' - Calls plotting functions to visualize positive and negative term results.
+  #' - Displays geolocalized results if data is available.
+  #' 
+  #' @param scores 
+  #'   A list containing sentiment analysis results. It includes:
+  #'   - Geolocalized data
+  #'   - Positive term counts
+  #'   - Negative term counts
+  #'   - Flags indicating missing data categories (1: geolocation, 2: positive, 3: negative)
+  #' @param lang 
+  #'   Specifies the language for output messages.
+  #'   - "ES" for Spanish
+  #'   - "EN" for English
+  #' @return NULL 
+  #' This function does not return a value but generates messages and plots based on the analysis results.
+  #' @examples
+  #' # Example usage:
+  #' handle_scores(scores = list(geo_data, pos_terms, neg_terms, missing_flags), lang = "EN")
   #'
   
   # Define language-specific strings

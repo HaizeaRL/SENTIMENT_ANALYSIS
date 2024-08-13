@@ -24,13 +24,17 @@ default_sentiment_dict <- list(
 
 get_integer_input <- function(option, lang = NULL) {
   
-  #' Function that validates whether the entered option is numeric.
-  #' If an incorrect input is entered, a message prompts the user to input a correct value.
+  #' Function that prompts the user to enter a numeric value and validates the input.
+  #' If the input is not numeric, it provides feedback in the selected language or default language, prompting the user to enter a valid number.
+  #' @param option A prompt message to guide the user.
+  #' @param lang An optional parameter to specify the language for error messages.
+  #' - "ES" for Spanish messages.
+  #' - "EN" for English messages.
   #' @return integer
-  #' This function returns the correctly entered number.
+  #' This function returns the correctly entered integer.
   #' @examples
   #' # Example usage:
-  #' get_integer_input(option =1)  # Prompts the user to enter a number, returning correct option
+  #' get_integer_input(option = "Enter your choice: ")  # Prompts the user to enter a number, returning the valid input
   #' 
   
   while (TRUE) {
@@ -48,7 +52,6 @@ get_integer_input <- function(option, lang = NULL) {
     }else{
       cat("Invalid input. Please enter a valid number.\n")
     }
-    
   }
 }
 
@@ -58,16 +61,18 @@ get_integer_input <- function(option, lang = NULL) {
 
 determine_language <-function(option){
   
-  #' Function that determine corresponding language characters. 
-  #' "ES" or "EN" depending of selected option.
+  #' Function that determines the language code based on the user’s selection.
+  #' Returns "ES" for Spanish or "EN" for English depending on the selected option.
+  #' 
   #' @param option 
-  #'   1 for Spanish,
-  #'   2 for English .
-  #' @return NULL 
-  #' This function returns "ES" or "EN" according to selected language.
+  #'   - 1 for Spanish
+  #'   - 2 for English
+  #' @return character 
+  #' This function returns "ES" or "EN" based on the selected option.
   #' @examples
   #' # Example usage:
-  #' determine_language(option =1)  # returns "ES"
+  #' determine_language(option = 1)  # Returns "ES"
+  #' determine_language(option = 2)  # Returns "EN"
   
   return(ifelse(option==1,"ES","EN"))
 }
@@ -78,16 +83,17 @@ determine_language <-function(option){
 #---------------------
 get_all_prompt_msgs<-function(lang){
   
-  #' Function that recover all prompt messages in corresponding language
+  #' Function that retrieves all prompt messages in the specified language.
   #' @param lang 
-  #'   "ES" for Spanish,
-  #'   "EN" for English .
+  #'   - "ES" for Spanish
+  #'   - "EN" for English
   #' @return list 
-  #' This function return a list with all prompt messages. These messages correspond to Spanish or English language.
+  #' This function returns a list of prompt messages in the specified language.
+  #' The list includes messages for various user prompts and actions.
   #' @examples
   #' # Example usage:
-  #' get_all_prompt_msgs(lang ="ES")  # obtain a list of spanish messages to prompt
-  #'
+  #' get_all_prompt_msgs(lang = "ES")  # Retrieves a list of Spanish prompt messages
+  #' get_all_prompt_msgs(lang = "EN")  # Retrieves a list of English prompt messages
   
   aux <-list()
   if(lang=="ES"){
@@ -134,19 +140,23 @@ get_all_prompt_msgs<-function(lang){
 #-----------------------------------------
 create_and_display_default_sentiment_files<-function(lang, msg){
   
-  #' This function creates the positive and negative sentiment files and displays their content
-  #' corresponding to the chosen language (Spanish or English). 
-  #'
+  #' This function creates the default positive and negative sentiment files for the specified language 
+  #' (Spanish or English) and displays their contents.
+  #' 
   #' @param lang 
-  #'   "ES" for Spanish,
-  #'   "EN" for English .
+  #'   - "ES" for Spanish
+  #'   - "EN" for English
+  #' @param msg 
+  #'   A list of prompt messages used to display information to the user.
   #' @return NULL 
-  #' This function calls to corresponding English_Sentiment_Files.R or Spanish_Sentiment_Files.R
-  #' scripts to create default sentiment files.
+  #' This function generates default sentiment files and prints their content to the console.
   #' @examples
   #' # Example usage:
-  #' create_and_display_default_sentiment_files(lang ="ES")  # create Spanish default pos & neg files
-  #'
+  #' create_and_display_default_sentiment_files(lang = "ES", msg = get_all_prompt_msgs("ES"))  
+  #' # Creates and displays Spanish default positive and negative sentiment files
+  #' 
+  #' create_and_display_default_sentiment_files(lang = "EN", msg = get_all_prompt_msgs("EN"))  
+  #' # Creates and displays English default positive and negative sentiment files
   
   # create corresponding folder
   if(!dir.exists(file.path(Sys.getenv("R_ROOT"), lang)))
@@ -169,11 +179,23 @@ create_and_display_default_sentiment_files<-function(lang, msg){
 }
 
 # -------------
-# loopAskData
+# loop_ask_data
 #--------------
 
-loopAskData<-function(msg)
-{
+loop_ask_data<-function(msg){
+  
+  #' This function repeatedly prompts the user to enter data until the user enters '0' to stop.
+  #' The entered values are collected into a list, with non-empty inputs being stored.
+  #' 
+  #' @param msg 
+  #'   A list of messages used for prompting the user.
+  #' @return vector 
+  #'   A vector containing all entered values, excluding 'NA' values.
+  #' @examples
+  #' # Example usage:
+  #' loop_ask_data(msg = get_all_prompt_msgs("ES"))  
+  #' # Prompts the user to enter data and collects inputs until '0' is entered.
+  #' 
   str <- -1
   lista <-vector()
   while(str != 0)
@@ -196,20 +218,20 @@ loopAskData<-function(msg)
 
 display_which_file_menu <- function(lang, msg){
   
-  #' Function display options to modify files
-  #' Only positive or negative file or both.
+  #' Function to display menu options for modifying sentiment files.
+  #' Prompts the user to select which files to modify: positive, negative, or both.
   #' 
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param msg 
-  #'    Corresponding language prompt message list
+  #'   A list of messages for prompting the user in the selected language.
   #' @return NULL 
-  #' This function does not return a value but handle actions.
+  #'   This function does not return a value but directs to the appropriate actions based on user choice.
   #' @examples
   #' # Example usage:
-  #' display_which_file_menu(lang = "ES" , msg = list()) # display file options in Spanish
-  #'
+  #' display_which_file_menu(lang = "ES", msg = get_all_prompt_msgs("ES"))  
+  #' # Displays file modification options in Spanish.
   
   repeat {
     cat(msg[[5]])
@@ -232,20 +254,21 @@ display_which_file_menu <- function(lang, msg){
 #-----------------------
 display_adding_menu <- function(lang, msg){
   
-  #' Function that display new emotions adding option and handles the response
-  #' Prompt message are in corresponding language
+  #' Function to display options for adding new emotion categories.
+  #' Prompts the user to choose whether to add new positive, negative, or both types of categories.
+  #' The prompt messages are provided in the selected language.
   #' 
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param msg 
-  #'    Corresponding language prompt message list
+  #'   A list of messages for prompting the user in the selected language.
   #' @return NULL 
-  #' This function does not return a value but handle actions.
+  #'   This function does not return a value but directs to the appropriate actions based on user input.
   #' @examples
   #' # Example usage:
-  #' display_adding_menu(lang = "ES" , msg = list())  # prompt Spanish messages and handle actions
-  #'
+  #' display_adding_menu(lang = "ES", msg = get_all_prompt_msgs("ES"))  
+  #' # Displays the menu for adding new emotion categories with Spanish messages and handles the user's response.
   
   repeat {
     cat(msg[[3]])
@@ -269,28 +292,27 @@ display_adding_menu <- function(lang, msg){
 
 handle_addings <- function(msg,lang, text){
   
-  #' Function that handles adding actions
-  #' Ask for values
-  #' Recover original values and add new ones removing duplicates
-  #' Update corresponding file. Eliminate previous file and replace with new values
+  #' Function to manage the addition of new emotion categories to sentiment files.
+  #' Prompts the user to enter new values, merges them with existing values, and updates the relevant file.
+  #' The prompt messages are provided in the selected language.
   #' 
   #' @param msg 
-  #'    Corresponding language prompt message list
+  #'   A list of prompt messages corresponding to the selected language.
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param text 
-  #'   "Pos_" for positive files
-  #'   "Neg_" for negative files
+  #'   "Pos_" for positive sentiment files,
+  #'   "Neg_" for negative sentiment files.
   #' @return NULL 
-  #' This function does not return a value but handle file updating actions.
+  #'   This function does not return a value but performs actions to update the sentiment files.
   #' @examples
   #' # Example usage:
-  #' handle_addings(lang = "ES" , msg = list(), text = "Pos_")  # Ask for new values in Spanish and update positive file
-  #'
+  #' handle_addings(msg = get_all_prompt_msgs("ES"), lang = "ES", text = "Pos_")  
+  #' # Prompts for new positive values in Spanish, updates the positive sentiment file with new entries.
   
   # ask for data
-  new_vals = loopAskData(msg)
+  new_vals = loop_ask_data(msg)
   
   # recover corresponding original values
   orig_vals = default_sentiment_dict[[paste0(text,lang)]]
@@ -315,24 +337,24 @@ handle_addings <- function(msg,lang, text){
 #-----------------------
 handle_adding_actions <- function(option, lang, msg){
   
-  #' Function that handle adding actions
-  #' Prompt corresponding message and redirect to corresponding actions
+  #' Function to handle actions for adding new emotion categories.
+  #' Prompts the user with the corresponding message and performs the updates on the specified files.
   #' 
   #' @param option 
-  #'   1 changes only in positive file
-  #'   2 changes only in negative file
-  #'   3 changes in both files
+  #'   1 for updates to the positive sentiment file only,
+  #'   2 for updates to the negative sentiment file only,
+  #'   3 for updates to both positive and negative sentiment files.
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param msg 
-  #'   Corresponding language prompt message list
+  #'   A list of prompt messages in the selected language.
   #' @return NULL 
-  #'   This function does not return a value but handle file updating actions.
+  #'   This function does not return a value but updates the sentiment files as specified.
   #' @examples
   #' # Example usage:
-  #' handle_adding_actions(option = 1 , lang = "ES", msg = list()) # Ask for new values update positive file in Spanish.
-  #'
+  #' handle_adding_actions(option = 1, lang = "ES", msg = get_all_prompt_msgs("ES"))  
+  #' # Prompts for new values for the positive sentiment file in Spanish and updates it.
   
   if(option == 1){
     # Asking for positives values
@@ -362,23 +384,25 @@ handle_adding_actions <- function(option, lang, msg){
 #-----------------------
 handle_file_option <- function(option, lang, msg) {
   
-  #' Function that handles file updating action
+  #' Function to handle updates to sentiment files based on user selection.
+  #' Prompts the user with messages in the specified language and performs updates 
+  #' to the sentiment files according to the selected option.
   #' 
   #' @param option 
-  #'   1 changes only in positive file
-  #'   2 changes only in negative file
-  #'   3 changes in both files
+  #'   1 for updating the positive sentiment file only,
+  #'   2 for updating the negative sentiment file only,
+  #'   3 for updating both positive and negative sentiment files.
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param msg 
-  #'    Corresponding language prompt message list
+  #'   A list of prompt messages in the selected language.
   #' @return NULL 
-  #' This function does not return a value but handle actions.
+  #'   This function does not return a value but performs the specified file update actions.
   #' @examples
   #' # Example usage:
-  #' handle_file_option(option = 1, lang = "ES" , msg = list()) # redirect to add new values in positive file in Spanish
-  #'
+  #' handle_file_option(option = 1, lang = "ES", msg = get_all_prompt_msgs("ES"))
+  #' # Redirects to update positive sentiment file in Spanish and exits the loop.
   
   if (option == 1) {
     handle_adding_actions(option,lang, msg)   # "POSITIVE"
@@ -404,23 +428,26 @@ handle_file_option <- function(option, lang, msg) {
 #-----------------------
 handle_change_option <- function(option, lang, msg) {
   
-  #' Function that handles new emotions adding menu responses
+  #' Function to handle user responses for adding new emotions.
+  #' Redirects to appropriate actions based on user selection, or provides an error message 
+  #' and prompts the user again for a valid option.
   #' 
   #' @param option 
-  #'   1 redirect to adding actions
-  #'   2 close the program
-  #'   else display an error and re-ask for correct option
+  #'   1 to redirect to the menu for adding new emotions,
+  #'   2 to close the program,
+  #'   otherwise display an error message and prompt the user again.
   #' @param lang 
-  #'   "ES" for Spanish prompt messages
-  #'   "EN" for English prompt messages
+  #'   "ES" for Spanish prompt messages,
+  #'   "EN" for English prompt messages.
   #' @param msg 
-  #'    Corresponding language prompt message list
+  #'   A list of prompt messages in the selected language.
   #' @return NULL 
-  #' This function does not return a value but handle actions.
+  #'   This function does not return a value but performs the appropriate actions based 
+  #'   on user input.
   #' @examples
   #' # Example usage:
-  #' handle_change_option(option = 1, lang = "ES" , msg = list()) # redirect new category adding action in Spanish
-  #'
+  #' handle_change_option(option = 1, lang = "ES", msg = get_all_prompt_msgs("ES"))
+  #' # Redirects to the menu for adding new categories in Spanish.
   
   if (option == 1) {
     
@@ -448,23 +475,20 @@ handle_change_option <- function(option, lang, msg) {
 #-----------------------
 handle_main_actions<-function(option){
   
-  #' Function that handles languages based actions
+  #' Function to handle language-specific actions.
   #' 
-  #' Determine corresponding language characters from selected option
-  #' Get corresponding language all prompt messages
-  #' Create and visualize default positive and negative emotion files
-  #' Ask for changes to those positive and negative emotion files
-  #' Handle specified changes
+  #' Determines the language based on the selected option, retrieves all prompt messages 
+  #' in that language, creates and displays default sentiment files, and allows the user 
+  #' to make changes to those files. Handles the specified changes accordingly.
   #' 
   #' @param option 
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
+  #'   1 for Spanish sentiment file creation,
+  #'   2 for English sentiment file creation.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #'   This function does not return a value but performs actions related to the chosen language.
   #' @examples
   #' # Example usage:
-  #' handle_main_actions(option =1)  # redirect to Spanish sentiment file creation
-  #'
+  #' handle_main_actions(option = 1)  # Directs to Spanish sentiment file creation and management.
   
   #' Determine corresponding language characters:
   #' Example: 1 - "ES"
@@ -494,18 +518,22 @@ handle_main_actions<-function(option){
 # Function to handle the menu options
 handle_main_menu_option <- function(option) {
   
-  #' Function that handles first menu's selection
+  #' Function to handle the main menu's selection.
+  #' 
+  #' Directs to different actions based on the user's menu choice. Handles options for 
+  #' creating sentiment files in Spanish or English, or exiting the program. Displays an 
+  #' error message and re-prompts the user for valid input if the option is invalid.
+  #' 
   #' @param option 
-  #'   0 skip from program
-  #'   1 directs to Spanish sentiment files creation
-  #'   2 directs to English sentiment files creation
-  #'   else display error message and re-ask for correct option
+  #'   0 to exit the program,
+  #'   1 to direct to Spanish sentiment files creation,
+  #'   2 to direct to English sentiment files creation.
   #' @return NULL 
-  #' This function does not return a value but redirect to corresponding language actions.
+  #'   This function does not return a value but redirects to the corresponding language actions 
+  #'   or exits the program based on user input.
   #' @examples
   #' # Example usage:
-  #' handle_main_menu_option(option =1)  # redirect to Spanish sentiment file creation
-  #'
+  #' handle_main_menu_option(option = 1)  # Redirects to Spanish sentiment file creation.
   
   if (option == 1) {
     # actions for "ES"
